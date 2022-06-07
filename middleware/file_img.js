@@ -1,4 +1,5 @@
 const fs = require('fs')
+const path = require('path')
 const multer = require('multer')
 
 const storage = multer.diskStorage({
@@ -8,13 +9,15 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
 // Возьмем оригинальное название файла, и под этим же названием сохраним его на сервере
-    cb(null, new Date().toISOString() + '-' + file.originalname)
+    cb(null, file.originalname)
   }
 })
 
 const types = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp']
 
 const fileFilter = (req, file, cb) => {
+  
+  
   if (types.includes(file.mimetype)) {
     cb(null, true)
   } else {
