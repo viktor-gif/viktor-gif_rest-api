@@ -56,7 +56,7 @@ app.listen(port, () => {
 
 
 // Route 
-// const User = require('./models/user')
+const User = require('./models/user')
 
 app.use(express.json({ extended: true }))
 app.use('/images', express.static(path.join(__dirname, 'images')))
@@ -67,9 +67,9 @@ const fileMiddleware = require('./middleware/file_img')
 
 router.post('/photo', fileMiddleware.single('avatar'), (req, res) => {
   const photoUrl = req.protocol + '://' + req.get('host') + '/' + req.file.path
-  try {
-    if (req.file)
-        console.log(req.get('host'));
+    try {
+        if (req.file) {
+            console.log(req.get('host'));
         console.log(photoUrl);
         console.log(req.originalUrl);
         console.log(req.file.path)
@@ -85,21 +85,22 @@ router.post('/photo', fileMiddleware.single('avatar'), (req, res) => {
         // })
         res.json(req.file)
       
-    // User.findOneAndUpdate({ _id: req.session.userId }, {
-    //     photos: {
-    //         large: photoUrl,
-    //         small: photoUrl,
-    //     }
+        User.findOneAndUpdate({ _id: req.session.userId }, {
+            photos: {
+                large: photoUrl,
+                small: photoUrl,
+            }
     
-    // }, (err, user) => {
+        }, (err, user) => {
     
-    //     if (err) next(err)
+            if (err) next(err)
 
-    //     res.json(res.data)
-    // })
-} catch (err) {
-    console.log(err);
-}
+            res.json(res.data)
+        })
+        }
+    } catch (err) {
+        console.log(err);
+    }
 })
 // Route 
 
