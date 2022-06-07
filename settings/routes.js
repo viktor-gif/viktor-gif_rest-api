@@ -7,6 +7,7 @@ module.exports = (app) => {
 
     app.route('/').get((req, res) => { res.write("<h1>Home page opened!!!</h1>") })
     app.route('/auth/login').post(usersControllerMongo.login)
+    app.route('/auth/login').delete(usersControllerMongo.logout)
     app.route('/auth/me').get(usersControllerMongo.me)
     app.route('/users').get(usersControllerMongo.users)
     app.route('/users/add').post(usersControllerMongo.add)

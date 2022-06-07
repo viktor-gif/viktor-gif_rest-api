@@ -9,6 +9,7 @@ const User = require('../models/user')
 const HttpError = require('../error');
 const { ConnectionPoolClearedEvent } = require('mongodb');
 const fs = require('fs')
+const path = require('path')
 
 /* GET users listing. */
 exports.users = (req, res, next) => {
@@ -33,7 +34,7 @@ exports.add = (req, res, next) => {
       city: "New-York"
     }
   })
-  user.save((err, users) => {
+  user.save((err, user) => {
     if (err) {
       if (err.message.includes('email')) {
         response.status('Вибачте, такий email уже існує', res, 403)
@@ -44,9 +45,14 @@ exports.add = (req, res, next) => {
       }
       
     } else {
-      // console.log(res)
-      console.log(users);
-      response.status(users, res, 200)
+      const pathName = path.join(__dirname.slice(0, -10), 'files', 'images', 'avatar', user._id.toString())
+      console.log('PATH___________: ' + pathName);
+      fs.mkdir(pathName, (err, data) => {
+        if (err) console.log(err);
+      })
+      console.log(res)
+      console.log(user);
+      response.status(user, res, 200)
     }
       
   })
@@ -161,3 +167,7 @@ exports.login = (req, res, next) => {
     
   })
 };
+exports.logout = (req, res, next) => {
+  req.session.destroy()
+  console.log("Delete one user");
+}
