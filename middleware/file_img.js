@@ -4,7 +4,7 @@ const multer = require('multer')
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // '/files' это директория в которую будут сохранятся файлы 
-    cb(null, 'images/')
+    cb(null,`files/images/avatar/${req.session.userId.toString()}`)
   },
   filename: (req, file, cb) => {
 // Возьмем оригинальное название файла, и под этим же названием сохраним его на сервере
@@ -22,4 +22,4 @@ const fileFilter = (req, file, cb) => {
   }
 }
 
-module.exports = multer({storage, fileFilter})
+module.exports = multer({ storage, fileFilter })

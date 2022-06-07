@@ -59,30 +59,28 @@ app.listen(port, () => {
 const User = require('./models/user')
 
 app.use(express.json({ extended: true }))
-app.use('/images', express.static(path.join(__dirname, 'images')))
+
 
 const { Router } = require('express')
 const router = Router()
 const fileMiddleware = require('./middleware/file_img')
+// app.use('/images', express.static(path.join(__dirname, 'files', 'images', 'avatar')))
+let userAvatarDirectory = ''
+app.use(`/files/images/avatar/${userAvatarDirectory}`, express.static(path.join(__dirname, 'files', 'images', 'avatar', userAvatarDirectory)))
 
 router.post('/photo', fileMiddleware.single('avatar'), (req, res) => {
-  const photoUrl = req.protocol + '://' + req.get('host') + '/' + req.file.path
+    // app.use('/images', express.static(path.join(__dirname, 'files', 'images', 'avatar', req.session.userId)))
+    userAvatarDirectory = req.session.userId
+
+    const photoUrl = req.protocol + '://' + req.get('host') + '/' + req.file.path
+    console.log('photourl: ' + photoUrl);
     try {
         if (req.file) {
             console.log(req.get('host'));
         console.log(photoUrl);
         console.log(req.originalUrl);
         console.log(req.file.path)
-        // fs.mkdir(path.join(__dirname, 'files', 'images', 'avatar', req.session.userId), (err) => {
-        //     if (err) {
-        //         if (err.code === 'EEXIST') {
-        //             console.log('Already exists')
-        //         } else {
-        //             console.log(err);
-        //         }
-            
-        //     };
-        // })
+        
         res.json(req.file)
       
         User.findOneAndUpdate({ _id: req.session.userId }, {
@@ -93,7 +91,7 @@ router.post('/photo', fileMiddleware.single('avatar'), (req, res) => {
     
         }, (err, user) => {
     
-            if (err) next(err)
+            //if (err) next(err)
 
             res.json(res.data)
         })
