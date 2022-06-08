@@ -2,6 +2,18 @@ const mongoose = require('mongoose'),
     Schema = mongoose.Schema
 
 const crypto = require('crypto')
+const { stringify } = require('querystring')
+
+const followersSchema = new Schema({
+    userId: {
+        type: String,
+        required: true
+    }, 
+    friendStatus: {
+        type: String,
+        default: 'unfollowed'
+    }
+})
 
 const schema = new Schema({
     email: {
@@ -89,6 +101,8 @@ const schema = new Schema({
             default: null
         }
     },
+    followers: [followersSchema],
+
     salt: {
         type: String,
         required: true
@@ -115,4 +129,4 @@ schema.methods.checkPassword = function (password) {
     return this.encryptPassword(password) === this.hashedPassword
 }
 
-module.exports = mongoose.model('User', schema)
+exports.user = mongoose.model('User', schema)

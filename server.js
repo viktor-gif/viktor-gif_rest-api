@@ -12,6 +12,7 @@ const path = require('path')
 // app.get('/', (req, res) => {
 //     res.send('Hello from api!')
 // })
+app.use(require('cors')())
 app.use(expressCspHeader({
     policies: {
         'default-src': [NONE],
@@ -33,7 +34,7 @@ app.use(session({
         path: "/",
         httpOnly: true,
         secure: false,
-        maxAge: null
+        maxAge: 86400000
     },
     store: MongoStore.create({
         mongoUrl: 'mongodb://localhost:27017/chat',
@@ -56,7 +57,7 @@ app.listen(port, () => {
 
 
 // Route 
-const User = require('./models/user')
+const User = require('./models/user').user
 
 app.use(express.json({ extended: true }))
 

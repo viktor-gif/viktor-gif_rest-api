@@ -5,11 +5,12 @@ const db = require('../settings/db_mongo')
 
 var express = require('express');
 var router = express.Router();
-const User = require('../models/user')
+const User = require('../models/user').user
 const HttpError = require('../error');
 const { ConnectionPoolClearedEvent } = require('mongodb');
 const fs = require('fs')
-const path = require('path')
+const path = require('path');
+const { is } = require('express/lib/request');
 
 /* GET users listing. */
 exports.users = (req, res, next) => {
@@ -32,6 +33,10 @@ exports.add = (req, res, next) => {
     location: {
       country: "USA",
       city: "New-York"
+    },
+    followers: {
+      userId: '1111',
+      friendStatus: 'unfollowed'
     }
   })
   user.save((err, user) => {
@@ -119,7 +124,7 @@ exports.updateProfile = (req, res, next) => {
       linkedin: req.body.data.linkedin,
     }
     
-  }, (err, user) => {
+  }, {new: true}, (err, user) => {
     
     if (err) next(err)
 
@@ -170,4 +175,32 @@ exports.login = (req, res, next) => {
 exports.logout = (req, res, next) => {
   req.session.destroy()
   console.log("Delete one user");
+}
+
+exports.setFollow = async(req, res, next) => {
+  if (req.session.userId) {
+    let newFollowersArray = []
+    const friend = await User.findById(req.query.userId)
+    const owner = await User.findById(req.session.userId)
+
+    let isThisUser = false
+    
+    await owner.followers.forEach(a => {
+      console.log(`DDDDDD: ${a.userId} DDDDD: ${friend._id}`)
+      if (a.userId == friend._id) isThisUser = true
+      newFollowersArray.push({userId: a.userId, friendStatus: a.friendStatus})
+    });
+    console.log('ISTHISUSER____: ' + isThisUser);
+    !isThisUser && newFollowersArray.push({ userId: req.query.userId, friendStatus: req.query.status })
+      User.findOneAndUpdate({ _id: req.session.userId },
+        { followers: newFollowersArray },
+        (err, user) => {
+    
+        if (err) next(err)
+          console.log(user);
+        
+    
+        })
+    res.json(res.data)
+  }
 }
