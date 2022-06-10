@@ -9,9 +9,6 @@ const { expressCspHeader, INLINE, NONE, SELF } = require('express-csp-header')
 const fs = require('fs')
 const path = require('path')
 
-// app.get('/', (req, res) => {
-//     res.send('Hello from api!')
-// })
 app.use(require('cors')())
 app.use(expressCspHeader({
     policies: {
@@ -42,17 +39,23 @@ app.use(session({
     })
 }))
 
-// app.use('/test', (req, res, next) => {
-//     req.session.some_________________ = 'skfjksdgjgossifsofsj--________________'
-//     res.send('Visits: ' + req.session.some_________________)
-// })
 
-const routes = require('./settings/routes')
-routes(app)
+
 
 app.listen(port, () => {
     console.log(`App listen on port ${port}`);
 })
+
+////////////////////
+app.use('/users', require('./settings/routes/users'))
+app.use('/profile', require('./settings/routes/profile'))
+app.use('/auth', require('./settings/routes/auth'))
+app.use('/follow', require('./settings/routes/follow'))
+////////////////////
+
+
+
+
 
 
 
@@ -66,7 +69,6 @@ const { Router } = require('express')
 const router = Router()
 
 const fileMiddleware = require('./middleware/file_img')
-// app.use('/images', express.static(path.join(__dirname, 'files', 'images', 'avatar')))
 let userAvatarDirectory = ''
 app.use(`/files/images/avatar/${userAvatarDirectory}`, express.static(path.join(__dirname, 'files', 'images', 'avatar', userAvatarDirectory)))
 
