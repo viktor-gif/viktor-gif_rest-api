@@ -16,6 +16,7 @@ module.exports = (app) => {
     app.route('/profile').put(usersControllerMongo.updateProfile)
     app.route('/profile/status').put(usersControllerMongo.updateStatus)
     app.route('/follow').post(usersControllerMongo.setFollow)
-
-    
+    app.route('/follow').delete(usersControllerMongo.deleteFollow)
+    app.route('/follow').get(usersControllerMongo.getFollow)
+  
 }

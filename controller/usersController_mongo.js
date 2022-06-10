@@ -191,22 +191,15 @@ exports.setFollow = async(req, res, next) => {
     
     await owner.followers.forEach(a => {
       if (a.userId == friend._id) isUserInDbOwner = true
-      console.log(a.friendStatus + ' query-for-answer');
-      console.log(a.userId == friend._id && a.friendStatus == 'query-for-answer')
-      if (a.userId == friend._id && a.friendStatus == 'query-for-answer') {
-        console.log('WITHIN A DFJDKFDKFDFJD');
+      if (isUserInDbOwner && a.friendStatus == 'query-for-answer') {
         newOwnerFollowersArray.push({userId: a.userId, friendStatus: 'followed'})
-      } else {
+      } else { 
         newOwnerFollowersArray.push({userId: a.userId, friendStatus: a.friendStatus})
       }
-      
     });
     await friend.followers.forEach(a => {
       if (a.userId == owner._id) isOwnerInDbUser = true
-      console.log(a.friendStatus + ' pending-for-answer');
-      console.log(a.userId == owner._id && a.friendStatus == 'pending-for-answer')
-      if (a.userId == owner._id && a.friendStatus == 'pending-for-answer') {
-console.log('WITHIN A DFJDKFDKFDFJD');
+      if (isOwnerInDbUser && a.friendStatus == 'pending-for-answer') {
         newFriendFollowersArray.push({ userId: a.userId, friendStatus: 'followed' })
       } else {
         newFriendFollowersArray.push({ userId: a.userId, friendStatus: a.friendStatus })
@@ -235,3 +228,67 @@ console.log('WITHIN A DFJDKFDKFDFJD');
     
   }
 }
+
+exports.deleteFollow = async(req, res, next) => {
+  if (req.session.userId) {
+
+    let newOwnerFollowersArray = []
+    let newFriendFollowersArray = []
+
+    const owner = await User.findById(req.session.userId)
+    const friend = await User.findById(req.query.userId)
+    
+    await owner.followers.forEach(a => {
+      if (a.userId != friend._id) {
+        newOwnerFollowersArray.push({userId: a.userId, friendStatus: a.friendStatus})
+      } else { 
+        return
+      }
+    });
+    await friend.followers.forEach(a => {
+      if ((a.userId != owner._id && a.friendStatus == 'pending-for-answer') || (a.userId != owner._id && a.friendStatus == 'followed')) {
+        newFriendFollowersArray.push({ userId: a.userId, friendStatus: a.friendStatus })
+      } else {
+        return
+      }
+    });
+    
+      User.findOneAndUpdate({ _id: req.session.userId },
+        { followers: newOwnerFollowersArray },
+        (err, user) => {
+    
+        if (err) next(err)
+        res.json(res.data)
+    
+        })
+      User.findOneAndUpdate({ _id: friend._id },
+        { followers: newFriendFollowersArray },
+        (err, user) => {
+        
+        if (err) next(err)
+        res.json(res.data)
+  
+      })
+    
+  }
+}
+exports.getFollow = async (req, res, next) => {
+  let followerData = ''
+  if (req.session.userId) {
+
+    const owner = await User.findById(req.session.userId)
+
+    
+    
+    owner.followers.forEach(a => {
+      if (a.userId == req.query.userId) {
+        followerData = (a.friendStatus)
+      } else {
+        return
+      }
+      
+    })
+  }
+  res.json(followerData)
+}
+
