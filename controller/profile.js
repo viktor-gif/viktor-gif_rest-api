@@ -7,7 +7,7 @@ var express = require('express');
 var router = express.Router();
 const User = require('../models/user').user
 const HttpError = require('../error');
-const { ConnectionPoolClearedEvent } = require('mongodb');
+const { ConnectionPoolClearedEvent, LoggerLevel } = require('mongodb');
 const fs = require('fs')
 const path = require('path');
 const { is } = require('express/lib/request');
@@ -81,4 +81,61 @@ exports.updateProfile = (req, res, next) => {
     
   })
 };
+
+
+
+let userAvatarDirectory = null
+exports.userAvatarDirectory = userAvatarDirectory
+
+
+exports.updatePhoto = (req, res) => {
+    console.log('9999999999999999999999999')
+    const pathAvatar = path.join(__dirname.slice(0, -10), 'files/images/avatar', req.session.userId)
+    console.log('fksdflsdfjskd: ' + pathAvatar)
+    fs.readdir(pathAvatar, (err, files) => {
+        if (err) throw err;
+
+        for (const file of files) {
+                if (file !== path.basename(req.file.path)) {
+                    console.log('FILE: ' + file)
+                    console.log('req.file.path____: ' + path.basename(req.file.path))
+                fs.unlink(path.join(pathAvatar, file), (err) => {
+                    if (err) throw err;
+                    console.log('Картинка видалена');
+                });
+            }
+        }
+    })
+
+        userAvatarDirectory = req.session.userId
+
+        const photoUrl = req.protocol + '://' + req.get('host') + '/' + req.file.path
+        console.log('photourl: ' + photoUrl);
+        try {
+            if (req.file) {
+                console.log(req.get('host'));
+            console.log(photoUrl);
+            console.log(req.originalUrl);
+            console.log(req.file.path)
+            
+            res.json(req.file)
+            
+            User.findOneAndUpdate({ _id: req.session.userId }, {
+                photos: {
+                    large: photoUrl,
+                    small: photoUrl,
+                }
+            
+            }, (err, user) => {
+            
+                //if (err) next(err)
+
+                res.json(res.data)
+            })
+            }
+        } catch (err) {
+            console.log(err);
+        }
+}
+
 
