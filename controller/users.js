@@ -14,17 +14,51 @@ const { is } = require('express/lib/request');
 
 /* GET users listing. */
 exports.users = (req, res, next) => {
-  User.find({}, 'fullName status photos location', (err, users) => {
+  let totalCount = null
+  let error = null
+  let statusCode = 200
+
+  let limit = req.query.pageSize || 10
+  let skip = req.query.pageNumber ? req.query.pageNumber * limit - limit : 0
+  let term = req.query.term || ''
+
+  const users = User.find()
+  users.count((err, count) => {
     if (err) {
-      return next(err)
+      statusCode = err.code
+      error = err.message
+    }
+    totalCount = count;
+  })
+
+    const regex = new RegExp(term, "i")
+User.find({fullName: regex}, 'fullName status photos location', (err, users) => {
+    if (err) {
+      statusCode = err.code
+      error = err.message
     } else {
-      res.json(users)
+      res.status(statusCode).json({
+        items: users.map(u => {
+          return {
+            id: u._id.toString(),
+            fullName: u.fullName,
+            status: u.status,
+            location: u.location,
+            photos: u.photos
+          }
+        }),
+        totalCount,
+        error: error
+      })
       // response.status(users, res)
     }
-  }).limit(10)
+  }).limit(limit).skip(skip)
+    
+  // })
+    
 };
 exports.add = (req, res, next) => {
-  console.log(req.query)
+  let statusCode = 200
   const user = new User({
     fullName: req.query.fullName,
     password: req.query.password,
@@ -55,9 +89,7 @@ exports.add = (req, res, next) => {
       fs.mkdir(pathName, (err, data) => {
         if (err) console.log(err);
       })
-      console.log(res)
-      console.log(user);
-      response.status(user, res, 200)
+      response.status(null, res, 200)
     }
       
   })

@@ -29,26 +29,36 @@ exports.login = (req, res, next) => {
   console.log(login, email, password)
 
   User.findOne({ login, email }, (err, user) => {
-    if (err) return next(err)
+    let error = null
+    let statusCode = 200
+    let data = null
+    if (err) {
+      error = err.message
+      statusCode = err.code
+    }
 
     if (user) {
-      console.log(user.checkPassword(password))
       if (user.checkPassword(password)) {
-        console.log('Within')
         
       } else {
-        next(new HttpError(403, "Пароль не вірний"))
+        error = "Пароль не вірний"
+        statusCode = 403
       }
-      console.log(req.session)
-      console.log(user.login)
       req.session.userId = user._id
       req.session.email = user.email
       req.session.login = user.login
-      res.send("Hello from session")
     } else {
-      if (err) return next(err)
+      if (err) {
+        error = err.message
+        statusCode = err.code
+      }
       
     }
+    res.status(statusCode).json({
+      statusCode,
+      error,
+      data
+    })
     // next(new HttpError(403, "email або login не вірний"))
     
   })
