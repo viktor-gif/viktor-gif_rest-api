@@ -2,6 +2,7 @@
 const Dialog = require('../models/dialogs').dialog
 const Message = require('../models/dialogs').message
 const errorHandler = require('../utils/errorHandler')
+const User = require('../models/user').user
 
 /* GET users listing. */
 exports.getDialogs = async (req, res, next) => {
@@ -10,17 +11,28 @@ exports.getDialogs = async (req, res, next) => {
       message: "Ви не зареєстровані. Ввійдіть, будь ласка, в аккаунт."
     })
   } else {
+    const ownerId = req.session.userId
     try {
       const ownerDialog = await Dialog.find({
-        ownerId: req.session.userId
+        ownerId: ownerId
       })
       const userDialog = await Dialog.find({
-        userId: req.session.userId
+        userId: ownerId
       })
-      console.log(ownerDialog)
-      console.log(userDialog)
-      res.json(ownerDialog.concat(userDialog))
+      const allDialogs = ownerDialog.concat(userDialog)
+      res.status(200).json({
+        items: allDialogs.map(d => {
+        const isOwner = d.ownerId == ownerId
+          return {
+            userId: isOwner ? d.userId : d.ownerId,
+            userImgUrl: isOwner ? d.userImgUrl : d.ownerImgUrl,
+            userName: isOwner ? d.userName : d.ownerName,
+            created: d.created
+          }
+        })
+      })
     } catch (err) {
+      console.log(err)
       errorHandler(res, err)
     }
   }
@@ -41,6 +53,8 @@ exports.addDialog = async (req, res, next) => {
           ownerId: req.query.userId,
           userId: req.session.userId
         })
+        const owner = await User.findById(req.session.userId)
+        const user = await User.findById(req.query.userId)
         if (ownerDialog || userDialog) {
           res.status(409).json({
             message: 'Такий діалог вже існує'
@@ -49,8 +63,13 @@ exports.addDialog = async (req, res, next) => {
           const newDialog = new Dialog({
             Dialog: [],
             ownerId: req.session.userId,
-            userId: req.query.userId
+            userId: req.query.userId,
+            ownerImgUrl: owner.photos.small,
+            userImgUrl: user.photos.small,
+            ownerName: owner.fullName,
+            userName: user.fullName
           })
+          console.log(newDialog)
           await newDialog.save()
           res.status(201).json({
             message: "Діалог успішно створений"
