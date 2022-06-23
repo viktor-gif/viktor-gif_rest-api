@@ -1,5 +1,6 @@
 {
     "port": 3000,
+    "jwt": "jwt_viktor-gif",
     "mongoose": {
         "uri": "mongodb://localhost:27017/chat",
         "options": {

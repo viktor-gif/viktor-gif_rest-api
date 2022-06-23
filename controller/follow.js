@@ -1,16 +1,6 @@
 'use strict'
-
-const response = require('../response')
 const db = require('../settings/db_mongo')
-
-var express = require('express');
-var router = express.Router();
-const User = require('../models/user').user
-const HttpError = require('../error');
-const { ConnectionPoolClearedEvent } = require('mongodb');
-const fs = require('fs')
-const path = require('path');
-const { is } = require('express/lib/request');
+const User = require('../models/user').user;
 
 exports.setFollow = async(req, res, next) => {
   if (req.session.userId) {

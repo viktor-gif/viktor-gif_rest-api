@@ -129,4 +129,4 @@ schema.methods.checkPassword = function (password) {
     return this.encryptPassword(password) === this.hashedPassword
 }
 
-exports.user = mongoose.model('User', schema)
+exports.user = mongoose.model('user', schema)

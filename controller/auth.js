@@ -1,70 +1,97 @@
 'use strict'
-
-const response = require('../response')
-const db = require('../settings/db_mongo')
-
-var express = require('express');
-var router = express.Router();
 const User = require('../models/user').user
-const HttpError = require('../error');
-const { ConnectionPoolClearedEvent } = require('mongodb');
-const fs = require('fs')
-const path = require('path');
-const { is } = require('express/lib/request');
+const errorHandler = require('../utils/errorHandler')
 
 
 
-exports.me = (req, res, next) => {
-  console.log(req.session.userId, req.session.email, req.session.login)
-  res.json({
-    id: req.session.userId,
-    email: req.session.email,
-    login: req.session.login,
-  })
+exports.me = async (req, res, next) => {
+  try {
+    if (req.session.userId) {
+      res.status(200).json({
+        id: req.session.userId,
+        email: req.session.email,
+        login: req.session.login,
+      })
+    } else {
+      res.status(403).json({
+        message: "Вибачте, ви не авторизовані"
+      })
+    }
+  } catch (err) {
+    errorHandler(res, err)
+  }
 }
-exports.login = (req, res, next) => {
+// exports.login = async(req, res, next) => {
+//   const candidate = await User.findOne({ email: req.query.email })
+
+//   const email = req.query.email
+//   const login = req.query.login
+//   const password = req.query.password
+
+//   if (candidate) {
+
+//     if (candidate.checkPassword(password)) {
+//       const token = jwt.sign({
+//         email: candidate.email,
+//         login: candidate.login,
+//         userId: candidate._id
+//       }, config.get('jwt'), {expiresIn: 60 * 60})
+//       res.status(200).json({
+//         token: `Bearer ${token}`
+//       })
+//     } else {
+//       res.status(401).json({
+//         message: 'Вибачте, пароль не вірний. Спробуйте ще раз.'
+//       })
+//     }
+
+//   } else {
+//     res.status(404).json({
+//       message: 'Користувача з таким e-mail не існує'
+//     })
+//   }
+// };
+exports.login = async (req, res, next) => {
   const email = req.query.email
   const login = req.query.login
   const password = req.query.password
-  console.log(login, email, password)
 
-  User.findOne({ login, email }, (err, user) => {
-    let error = null
-    let statusCode = 200
-    let data = null
-    if (err) {
-      error = err.message
-      statusCode = err.code
-    }
+  try{
+    const user = await User.findOne({ login, email })
 
     if (user) {
       if (user.checkPassword(password)) {
-        
+        req.session.userId = user._id
+        req.session.email = user.email
+        req.session.login = user.login
+
+        res.status(200).json({
+          statusCode: 0,
+          data: []
+        })
       } else {
-        error = "Пароль не вірний"
-        statusCode = 403
+        res.status(403).json({
+          message: "Пароль не вірний"
+        })
       }
-      req.session.userId = user._id
-      req.session.email = user.email
-      req.session.login = user.login
     } else {
-      if (err) {
-        error = err.message
-        statusCode = err.code
-      }
-      
+      res.status(404).json({
+        message: "Такого користувача не існує"
+      })
     }
-    res.status(statusCode).json({
-      statusCode,
-      error,
-      data
-    })
-    // next(new HttpError(403, "email або login не вірний"))
     
-  })
+  } catch (err) {
+    errorHandler(res, err)  
+  }
 };
-exports.logout = (req, res, next) => {
-  req.session.destroy()
-  console.log("Delete one user");
+exports.logout = async (req, res, next) => {
+  try {
+    req.session.destroy()
+    res.status(200).json({
+      message: "Ви вийшли зі свого аккаунта"
+    })
+  } catch (err) {
+    errorHandler(res, err)
+  }
 }
 

@@ -1,54 +1,46 @@
 'use strict'
 
-const response = require('../response')
-const db = require('../settings/db_mongo')
-
-var express = require('express');
-var router = express.Router();
 const User = require('../models/user').user
-const HttpError = require('../error');
-const { ConnectionPoolClearedEvent, LoggerLevel } = require('mongodb');
 const fs = require('fs')
 const path = require('path');
-const { is } = require('express/lib/request');
+const errorHandler = require('../utils/errorHandler');
 
-exports.userProfile = (req, res, next) => {
-  User.findById(req.params.userId,
-    'fullName lookingForAJobDescription aboutMe lookingForAJob photos location contacts created',
-    (err, user) => {
-    
-    if (!user) {
-      console.log(err)
-      next(new HttpError(404, "Такого користувача не існує"))
+exports.userProfile = async(req, res, next) => {
+  try{
+    const userProfile = await User.findById(req.params.userId,
+      'fullName lookingForAJobDescription aboutMe lookingForAJob photos location contacts created')
+
+    if (!userProfile) {
+      res.status(404), json("Такого користувача не існує")
     } else {
-      if (err) console.log(err)
-      res.json(user)
-      
+      res.json(userProfile)
+
     }
-    
-  })
+  } catch (err) {
+    errorHandler(res, err)
+  }
 };
-exports.userStatus = (req, res, next) => {
-  User.findById(req.params.userId, 'status', (err, user) => {
-    
+exports.userStatus = async (req, res, next) => {
+  const user = await User.findById(req.params.userId, 'status')
+  try{
     if (!user) {
-      console.log(err)
-      next(new HttpError(404, "Такого користувача не існує"))
+      res.status(404).json("Такого користувача не існує")
     } else {
-      if (err) console.log(err)
       res.json(user)
-      
     }
-    
-  })
+  } catch (err) {
+    errorHandler(res, err)
+  }
 };
-exports.updateStatus = (req, res, next) => {
-  
+exports.updateStatus = async (req, res, next) => {
+
+  const user = await User.findOneAndUpdate({_id: req.session.userId}, {status: req.body.status})
+  console.log(user)
   User.findOneAndUpdate({_id: req.session.userId}, {status: req.body.status}, (err, user) => {
     
     if (err) next(err)
 
-    res.json(res.data)
+    res.status(200).json(res.data)
     
   })
 };
@@ -57,8 +49,8 @@ exports.updateProfile = (req, res, next) => {
   User.findOneAndUpdate({ _id: req.session.userId }, {
     fullName: req.body.data.fullName,
     aboutMe: req.body.data.aboutMe,
-    lookingForAJobDescription: req.body.data.lookingForAJobDescription,
     lookingForAJob: req.body.data.lookingForAJob,
+    lookingForAJobDescription: req.body.data.lookingForAJobDescription,
     location: {
       country: req.body.data.country,
       city: req.body.data.city,
@@ -77,7 +69,7 @@ exports.updateProfile = (req, res, next) => {
     
     if (err) next(err)
 
-    res.json(res.data)
+    res.json('All right')
     
   })
 };
