@@ -1,6 +1,8 @@
 'use strict'
 const User = require('../models/user').user
 const errorHandler = require('../utils/errorHandler')
+const path = require('path')
+const fs = require('fs')
 
 /* GET users listing. */
 exports.users = async (req, res, next) => {
@@ -113,6 +115,11 @@ exports.add = async (req, res, next) => {
       }
     })
     try {
+      const pathName = path.join(__dirname.slice(0, -10), 'files', 'images', 'avatar', user._id.toString())
+      console.log('PATH___________: ' + pathName);
+      fs.mkdir(pathName, (err, data) => {
+        if (err) console.log(err);
+      })
       await user.save()
       res.status(201).json(user)
     } catch (err) {

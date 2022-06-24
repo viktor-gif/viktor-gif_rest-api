@@ -53,11 +53,10 @@ exports.me = async (req, res, next) => {
 // };
 exports.login = async (req, res, next) => {
   const email = req.query.email
-  const login = req.query.login
   const password = req.query.password
 
   try{
-    const user = await User.findOne({ login, email })
+    const user = await User.findOne({ email })
 
     if (user) {
       if (user.checkPassword(password)) {

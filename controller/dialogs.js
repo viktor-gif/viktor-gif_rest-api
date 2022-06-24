@@ -24,6 +24,7 @@ exports.getDialogs = async (req, res, next) => {
         items: allDialogs.map(d => {
         const isOwner = d.ownerId == ownerId
           return {
+            dialogId: d._id,
             userId: isOwner ? d.userId : d.ownerId,
             userImgUrl: isOwner ? d.userImgUrl : d.ownerImgUrl,
             userName: isOwner ? d.userName : d.ownerName,
@@ -102,7 +103,7 @@ exports.sendDialogMessage = async (req, res, next) => {
         dialog.dialog.push(newMessage)
         await dialog.save()
         res.status(201).json({
-          message: 'Повідомлення відправлено'
+          message: newMessage
         })
       }
       
