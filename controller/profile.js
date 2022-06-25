@@ -4,29 +4,40 @@ const User = require('../models/user').user
 const fs = require('fs')
 const path = require('path');
 const errorHandler = require('../utils/errorHandler');
+const userErrorHandler = require('../utils/userErrorHandler');
 
-exports.userProfile = async(req, res, next) => {
-  try{
-    const userProfile = await User.findById(req.params.userId,
-      'fullName lookingForAJobDescription aboutMe lookingForAJob photos location contacts created')
-
-    if (!userProfile) {
-      res.status(404), json("Такого користувача не існує")
+exports.userProfile = async (req, res, next) => {
+  const userId = req.params.userId
+  try {
+    if (!userId) {
+      userErrorHandler(res, 401, "Вибачте, ви не авторизовані")
     } else {
-      res.json(userProfile)
+      const userProfile = await User.findById(userId,
+        'fullName lookingForAJobDescription aboutMe lookingForAJob photos location contacts created')
 
+      if (!userProfile) {
+        res.status(404), json("Такого користувача не існує")
+      } else {
+        res.json(userProfile)
+
+      }
     }
   } catch (err) {
     errorHandler(res, err)
   }
 };
 exports.userStatus = async (req, res, next) => {
-  const user = await User.findById(req.params.userId, 'status')
-  try{
-    if (!user) {
-      res.status(404).json("Такого користувача не існує")
+  const userId = req.params.userId
+  try {
+    if (!userId) {
+      userErrorHandler(res, 401, "Вибачте, ви не авторизовані")
     } else {
-      res.json(user)
+      const user = await User.findById(req.params.userId, 'status')
+      if (!user) {
+        res.status(404).json("Такого користувача не існує")
+      } else {
+        res.json(user)
+      }
     }
   } catch (err) {
     errorHandler(res, err)

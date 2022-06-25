@@ -1,8 +1,8 @@
 'use strict'
 const User = require('../models/user').user
 const errorHandler = require('../utils/errorHandler')
-
-
+const successHandler = require('../utils/successHandler')
+const userErrorHandler = require('../utils/userErrorHandler')
 
 exports.me = async (req, res, next) => {
   try {
@@ -13,9 +13,7 @@ exports.me = async (req, res, next) => {
         login: req.session.login,
       })
     } else {
-      res.status(403).json({
-        message: "Вибачте, ви не авторизовані"
-      })
+      userErrorHandler(res, 403, "Вибачте, ви не авторизовані")
     }
   } catch (err) {
     errorHandler(res, err)
@@ -64,19 +62,12 @@ exports.login = async (req, res, next) => {
         req.session.email = user.email
         req.session.login = user.login
 
-        res.status(200).json({
-          statusCode: 0,
-          data: []
-        })
+        successHandler(res, 200, "Ви залогінились")
       } else {
-        res.status(403).json({
-          message: "Пароль не вірний"
-        })
+        userErrorHandler(res, 403, "Пароль не вірний")
       }
     } else {
-      res.status(404).json({
-        message: "Такого користувача не існує"
-      })
+      userErrorHandler(res, 404, "Такого користувача не існує")
     }
     
   } catch (err) {
@@ -86,9 +77,7 @@ exports.login = async (req, res, next) => {
 exports.logout = async (req, res, next) => {
   try {
     req.session.destroy()
-    res.status(200).json({
-      message: "Ви вийшли зі свого аккаунта"
-    })
+    successHandler(res, 200, "Ви залишили свою сторінку")
   } catch (err) {
     errorHandler(res, err)
   }

@@ -22,7 +22,7 @@ exports.getDialogs = async (req, res, next) => {
       const allDialogs = ownerDialog.concat(userDialog)
       res.status(200).json({
         items: allDialogs.map(d => {
-        const isOwner = d.ownerId == ownerId
+        const isOwner = (d.ownerId == ownerId)
           return {
             dialogId: d._id,
             userId: isOwner ? d.userId : d.ownerId,
@@ -70,7 +70,6 @@ exports.addDialog = async (req, res, next) => {
             ownerName: owner.fullName,
             userName: user.fullName
           })
-          console.log(newDialog)
           await newDialog.save()
           res.status(201).json({
             message: "Діалог успішно створений"
