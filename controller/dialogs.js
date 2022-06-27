@@ -139,8 +139,8 @@ exports.deleteMessage = async (req, res, next) => {
     })
   } else {
     try {
-      const dialog = await Dialog.findById(req.params.messageId)
-      dialog.dialog.pull({_id: req.query.messageId})
+      const dialog = await Dialog.findById(req.params.dialogId)
+      dialog.dialog.pull({_id: req.params.messageId})
       await dialog.save()
       res.json('Deleted')
     } catch (err) {

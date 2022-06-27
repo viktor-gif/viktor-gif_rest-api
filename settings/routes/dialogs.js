@@ -10,7 +10,7 @@ router.get('/', controller.getDialogs)
 router.post('/add', controller.addDialog)
 router.get('/:dialogId/messages', controller.getDialogMessages)
 router.post('/:dialogId/messages', controller.sendDialogMessage)
-router.delete('/messages/:messageId', controller.deleteMessage)
+router.delete('/:dialogId/messages/:messageId', controller.deleteMessage)
 
 
 module.exports = router
