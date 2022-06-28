@@ -2,6 +2,8 @@
 const Dialog = require('../models/dialogs').dialog
 const Message = require('../models/dialogs').message
 const errorHandler = require('../utils/errorHandler')
+const successHandler = require('../utils/successHandler')
+const userErrorHandler = require('../utils/userErrorHandler')
 const User = require('../models/user').user
 
 /* GET users listing. */
@@ -148,5 +150,29 @@ exports.deleteMessage = async (req, res, next) => {
     }
   }
 }
-
-
+async function setOrRestoreSpam(req, res, isSpam, resMessage) {
+  if (!req.session.userId) {
+    res.status(403).json({
+      message: "Ви не зареєстровані. Ввійдіть, будь ласка, в аккаунт."
+    })
+  } else {
+    try {
+      const setSpam = await Dialog.updateOne(
+        { _id: req.params.dialogId, "dialog._id": req.params.messageId },
+        { $set: { "dialog.$.isSpam": isSpam } })
+      if (!setSpam) {
+        userErrorHandler(res, 404, "Повідомлення не знайдено")
+      } else {
+        successHandler(res, 200, resMessage)
+      }
+    } catch (err) {
+      errorHandler(res, err)
+    }
+  }
+}
+exports.setSpam = (req, res, next) => {
+  setOrRestoreSpam(req, res, true, "Повідомлення додано до спаму")
+}
+exports.restoreSpam = (req, res, next) => {
+  setOrRestoreSpam(req, res, false, "Повідомлення видалено зі спаму")
+}
