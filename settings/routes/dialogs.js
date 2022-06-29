@@ -14,6 +14,7 @@ router.delete('/:dialogId/messages/:messageId', controller.deleteMessage)
 router.delete('/:dialogId/messages/:messageId', controller.deleteMessage)
 router.put('/:dialogId/messages/:messageId/set_spam', controller.setSpam)
 router.put('/:dialogId/messages/:messageId/restore_spam', controller.restoreSpam)
+router.put('/:dialogId/messages/:messageId/setViewed', controller.setViewedMessage)
 
 
 module.exports = router

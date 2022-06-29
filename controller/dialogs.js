@@ -176,3 +176,28 @@ exports.setSpam = (req, res, next) => {
 exports.restoreSpam = (req, res, next) => {
   setOrRestoreSpam(req, res, false, "Повідомлення видалено зі спаму")
 }
+
+exports.setViewedMessage = async (req, res, next) => {
+  if (!req.session.userId) {
+    res.status(403).json({
+      message: "Ви не зареєстровані. Ввійдіть, будь ласка, в аккаунт."
+    })
+  } else {
+    try {
+      if (req.query.senderId != req.session.userId) {
+        const setSpam = await Dialog.updateOne(
+          { _id: req.params.dialogId, "dialog._id": req.params.messageId },
+          { $set: { "dialog.$.viewed": true } })
+        if (!setSpam) {
+          userErrorHandler(res, 404, "Повідомлення не знайдено")
+        } else {
+          successHandler(res, 200, "Повідомлення переглянуто")
+        }
+      } else {
+        res.json('WOOPS!')
+      }
+    } catch (err) {
+      errorHandler(res, err)
+    }
+  }
+}
