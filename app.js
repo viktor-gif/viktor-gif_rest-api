@@ -49,6 +49,7 @@ app.use('/profile', require('./settings/routes/profile'))
 app.use('/auth', require('./settings/routes/auth'))
 app.use('/follow', require('./settings/routes/follow'))
 app.use('/dialogs', require('./settings/routes/dialogs'))
+app.use('/posts', require('./settings/routes/posts'))
 // Routes
 
 let userAvatarDirectory = require('./controller/profile').userAvatarDirectory
