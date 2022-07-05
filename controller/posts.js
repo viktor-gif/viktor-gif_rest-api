@@ -93,3 +93,30 @@ exports.updatePost = async (req, res, next) => {
     }
   }
 }
+exports.toggleLike = async (req, res, next) => {
+  if (!req.session.userId) {
+    res.status(403).json({
+      message: "Ви не зареєстровані. Ввійдіть, будь ласка, в аккаунт."
+    })
+  } else {
+    try {
+      const post = await Post.findById(req.params.postId)
+      console.log(post.likedUsers, post.likesCount)
+      if (post.likedUsers.includes(req.session.userId)) {
+        await Post.findByIdAndUpdate(req.params.postId,
+          { likesCount: post.likesCount - 1 })
+        post.likedUsers.pull(req.session.userId)
+        await post.save()
+        successHandler(res, 200, "Ви видалили лайк")
+      } else {
+        await Post.findByIdAndUpdate(req.params.postId,
+          { likesCount: post.likesCount + 1 })
+        post.likedUsers.push(req.session.userId)
+        await post.save()
+        successHandler(res, 200, "Ви поставили лайк")
+      }
+    } catch (err) {
+      errorHandler(res, err)
+    }
+  }
+}

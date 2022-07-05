@@ -38,6 +38,7 @@ const postsSchema = new Schema({
         type: String,
         required: true
     },
+    likedUsers: [String],
     likesCount: {
         type: Number,
         default: 0

@@ -10,6 +10,7 @@ router.get('/', controller.getPosts)
 router.post('/', controller.addPost)
 router.delete('/:postId', controller.deletePost)
 router.put('/:postId', controller.updatePost)
+router.put('/:postId/like', controller.toggleLike)
 
 module.exports = router
 
