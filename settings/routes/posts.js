@@ -9,6 +9,7 @@ const router = express.Router()
 router.get('/', controller.getPosts)
 router.post('/', controller.addPost)
 router.delete('/:postId', controller.deletePost)
+router.put('/:postId', controller.updatePost)
 
 module.exports = router
 

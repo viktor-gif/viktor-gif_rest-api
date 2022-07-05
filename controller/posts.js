@@ -67,3 +67,29 @@ exports.deletePost = async (req, res, next) => {
     }
   }
 }
+exports.updatePost = async (req, res, next) => {
+  if (!req.session.userId) {
+    res.status(403).json({
+      message: "Ви не зареєстровані. Ввійдіть, будь ласка, в аккаунт."
+    })
+  } else {
+    try {
+      Post.findByIdAndUpdate(req.params.postId,
+        {postText: req.body.postText},
+        (err, result) => {
+        if (err) {
+          console.log(err)
+        } else {
+          if (result) {
+            console.log(result)
+            successHandler(res, 200, "Ви змінили текст поста")
+          } else {
+            userErrorHandler(res, 404, "Такого поста не існує")
+          }
+        }
+      })
+    } catch (err) {
+      errorHandler(res, err)
+    }
+  }
+}
