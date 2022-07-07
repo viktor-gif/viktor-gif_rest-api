@@ -2,7 +2,8 @@
 const errorHandler = require('../utils/errorHandler')
 const successHandler = require('../utils/successHandler')
 const userErrorHandler = require('../utils/userErrorHandler')
-const Post = require('../models/posts')
+const Post = require('../models/posts').post
+const Comment = require('../models/posts').comment
 const { json } = require('body-parser')
 
 /* GET users listing. */
@@ -14,7 +15,6 @@ exports.getPosts = async (req, res, next) => {
   } else {
     try {
       const posts = await Post.find({ profileId: req.query.userId })
-      console.log(posts)
       res.status(200).json(posts)
     } catch (err) {
       console.log(err)
@@ -55,7 +55,6 @@ exports.deletePost = async (req, res, next) => {
           console.log(err)
         } else {
           if (result) {
-            console.log(result)
             successHandler(res, 200, "Ви видалили пост")
           } else {
             userErrorHandler(res, 404, "Такого поста не існує")
@@ -81,7 +80,6 @@ exports.updatePost = async (req, res, next) => {
           console.log(err)
         } else {
           if (result) {
-            console.log(result)
             successHandler(res, 200, "Ви змінили текст поста")
           } else {
             userErrorHandler(res, 404, "Такого поста не існує")
@@ -112,6 +110,102 @@ exports.toggleLike = async (req, res, next) => {
         await Post.findByIdAndUpdate(req.params.postId,
           { likesCount: post.likesCount + 1 })
         post.likedUsers.push(req.session.userId)
+        await post.save()
+        successHandler(res, 200, "Ви поставили лайк")
+      }
+    } catch (err) {
+      errorHandler(res, err)
+    }
+  }
+}
+exports.addComment = async (req, res, next) => {
+  if (!req.session.userId) {
+    res.status(403).json({
+      message: "Ви не зареєстровані. Ввійдіть, будь ласка, в аккаунт."
+    })
+  } else {
+    try {
+      const newComment = new Comment({
+        commentText: req.body.commentText,
+        authorId: req.session.userId,
+      })
+      // const newMessage = { message: 'hello world' }
+      const post = await Post.findById(req.params.postId)
+      if (!post) {
+        res.status(404).json({
+          message: "Такого поста не існує"
+        })
+      } else {
+        post.comments.push(newComment)
+        await post.save()
+        successHandler(res, 201, "Коментар додано")
+      }
+      
+    } catch (err) {
+      errorHandler(res, err)
+    }
+  }
+}
+exports.updateComment = async (req, res, next) => {
+  if (!req.session.userId) {
+    res.status(403).json({
+      message: "Ви не зареєстровані. Ввійдіть, будь ласка, в аккаунт."
+    })
+  } else {
+    try {
+      const updatedPost = await Post.updateOne(
+        { _id: req.params.postId, "comments._id": req.params.commentId },
+        { $set: { "comments.$.commentText": req.body.commentText } })
+      if (!updatedPost) {
+        userErrorHandler(res, 404, "Такий коментар не знайдено")
+      } else {
+        successHandler(res, 200, "Коментар було виправлено")
+      }
+    } catch (err) {
+      errorHandler(res, err)
+    }
+  }
+}
+exports.deleteComment = async (req, res, next) => {
+  if (!req.session.userId) {
+    res.status(403).json({
+      message: "Ви не зареєстровані. Ввійдіть, будь ласка, в аккаунт."
+    })
+  } else {
+    try {
+      // const newMessage = { message: 'hello world' }
+      const post = await Post.findById(req.params.postId)
+      if (!post) {
+        res.status(404).json({
+          message: "Такого коментаря не існує"
+        })
+      } else {
+        post.comments.pull({_id: req.params.commentId})
+        await post.save()
+        successHandler(res, 200, "Коментар видалено")
+      }
+      
+    } catch (err) {
+      errorHandler(res, err)
+    }
+  }
+}
+exports.toggleCommentLike = async (req, res, next) => {
+  if (!req.session.userId) {
+    res.status(403).json({
+      message: "Ви не зареєстровані. Ввійдіть, будь ласка, в аккаунт."
+    })
+  } else {
+    try {
+      const post = await Post.findOne({ _id: req.params.postId })
+      const comment = post.comments.find(c => c._id == req.params.commentId)
+
+      if (comment.likedUsers.includes(req.session.userId)) {
+        comment.likedUsers.pull(req.session.userId)
+        await post.save()
+        successHandler(res, 200, "Ви видалили лайк")
+      } else {
+        comment.likedUsers.push(req.session.userId)
         await post.save()
         successHandler(res, 200, "Ви поставили лайк")
       }
