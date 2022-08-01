@@ -6,17 +6,17 @@ const fs = require('fs')
 
 /* GET users listing. */
 exports.users = async (req, res, next) => {
-  console.log(req.user);
-  try{
+  try {
+    const authUser = await User.findById(req.session.userId)
     let totalCount = null
     let error = null
 
     let limit = req.query.pageSize || 10
     let skip = req.query.pageNumber ? req.query.pageNumber * limit - limit : 0
     let term = req.query.term || ''
+    let friendStatus = req.query.friendStatus || "followed"
 
-    const allUsers = User.find()
-    allUsers.count((err, count) => {
+    User.find().count((err, count) => {
       if (err) {
         errorHandler(res, err)
       }
@@ -24,26 +24,52 @@ exports.users = async (req, res, next) => {
     })
 
     const regex = new RegExp(term, "i")
-    const users = await User.find({ fullName: regex }, 'fullName status photos location').limit(limit).skip(skip)
-      if (users) {
-        res.status(200).json({
-          items: users.map(u => {
-            return {
-              id: u._id.toString(),
-              fullName: u.fullName,
-              status: u.status,
-              location: u.location,
-              photos: u.photos
-            }
-          }),
-          totalCount,
-          error: error
-        })
-      } else {
-        res.status(404).json({
-          message: "Таких користувачів не існує"
-        })
-      }
+    // const users = await User.find({ fullName: regex }, 'fullName status photos location followers').limit(limit).skip(skip)
+
+    const authUserFollowersMapped = authUser.followers.map(f => {
+      return f.userId + f.friendStatus
+
+    })
+
+    let users
+    // let filteredUsers
+    if (friendStatus === "all") {
+      users = await User.find({ fullName: regex }, 'fullName status photos location followers').limit(limit).skip(skip)
+    } else if (friendStatus === "friends") {
+      users = await User.find({ fullName: regex }, 'fullName status photos location followers').limit(limit).skip(skip)
+      users = users.filter(u => authUserFollowersMapped.includes(u.id + 'followed'))
+      
+    } else if (friendStatus === "followers") {
+      users = await User.find({ fullName: regex }, 'fullName status photos location followers').limit(limit).skip(skip)
+      users = users.filter(u => authUserFollowersMapped.includes(u.id + 'query-for-answer'))
+      
+    } else if (friendStatus === "followed") {
+      users = await User.find({ fullName: regex }, 'fullName status photos location followers').limit(limit).skip(skip)
+      users = users.filter(u => authUserFollowersMapped.includes(u.id + 'pending-for-answer'))
+      
+    }
+
+    if (users) {
+      res.status(200).json({
+        items: users.map(u => {
+          // console.log(authUser.followers.filter(f => f.userId == u._id))
+          return {
+            id: u._id.toString(),
+            fullName: u.fullName,
+            status: u.status,
+            location: u.location,
+            photos: u.photos,
+            followers: u.followers
+          }
+        }),
+        totalCount,
+        error: error
+      })
+    } else {
+      res.status(404).json({
+        message: "Таких користувачів не існує"
+      })
+    }
   } catch (err) {
     errorHandler(res, err)
   }
@@ -73,7 +99,7 @@ exports.users = async (req, res, next) => {
 //       } else {
 //         next(err)
 //       }
-      
+
 //     } else {
 //       const pathName = path.join(__dirname.slice(0, -10), 'files', 'images', 'avatar', user._id.toString())
 //       console.log('PATH___________: ' + pathName);
@@ -82,13 +108,13 @@ exports.users = async (req, res, next) => {
 //       })
 //       response.status(null, res, 200)
 //     }
-      
+
 //   })
-  
+
 // }
 exports.add = async (req, res, next) => {
   const candidate = await User.findOne({ email: req.query.email })
-  
+
   if (candidate) {
     res.status(409).json({
       message: 'Такий email вже зайнятий. Спробуйте другий.'
