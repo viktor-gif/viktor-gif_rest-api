@@ -7,14 +7,24 @@ const fs = require('fs')
 /* GET users listing. */
 exports.users = async (req, res, next) => {
   try {
+
+
     const authUser = await User.findById(req.session.userId)
+    const authFollowers = authUser.followers
+
+
+    const authFriends = authFollowers.filter(f => f.friendStatus === 'followed')
+    const authFriendsIds = authFriends.map(f => f.userId)
+    const userFriendsQuery = authFollowers.filter(f => f.friendStatus === 'query-for-answer')
+    const authFriendsQuery = authFollowers.filter(f => f.friendStatus === 'pending-for-answer')
+
     let totalCount = null
     let error = null
 
     let limit = req.query.pageSize || 10
     let skip = req.query.pageNumber ? req.query.pageNumber * limit - limit : 0
     let term = req.query.term || ''
-    let friendStatus = req.query.friendStatus || "followed"
+    let friendStatus = req.query.friendStatus || "all"
 
     User.find().count((err, count) => {
       if (err) {
@@ -35,18 +45,44 @@ exports.users = async (req, res, next) => {
     // let filteredUsers
     if (friendStatus === "all") {
       users = await User.find({ fullName: regex }, 'fullName status photos location followers').limit(limit).skip(skip)
+
     } else if (friendStatus === "friends") {
+
       users = await User.find({ fullName: regex }, 'fullName status photos location followers').limit(limit).skip(skip)
       users = users.filter(u => authUserFollowersMapped.includes(u.id + 'followed'))
+      totalCount = authFriends.length
+
+      // let arr = []
+
+      // authFriendsIds.forEach(async (f) => {
+      //     User.find({
+      //       fullName: regex,
+      //       _id: f
+      //     }, 'fullName status photos location followers').limit(limit).skip(skip)
+      //     .then(user => arr.push({a: 'test'}))
+      // })
       
+      // console.log(arr)
+      // users = await User.find({
+      //   fullName: regex,
+      //   _id: '62b58beda8b5726e3fe3e691',
+      //   _id: '62b58bdba8b5726e3fe3e689'
+      // }, 'fullName status photos location followers').limit(limit).skip(skip)
+      // users = users.filter(u => authUserFollowersMapped.includes(u.id + 'followed'))
+      // totalCount = authFriends.length
+
     } else if (friendStatus === "followers") {
       users = await User.find({ fullName: regex }, 'fullName status photos location followers').limit(limit).skip(skip)
       users = users.filter(u => authUserFollowersMapped.includes(u.id + 'query-for-answer'))
-      
+      totalCount = userFriendsQuery.length
+
     } else if (friendStatus === "followed") {
       users = await User.find({ fullName: regex }, 'fullName status photos location followers').limit(limit).skip(skip)
-      users = users.filter(u => authUserFollowersMapped.includes(u.id + 'pending-for-answer'))
       
+      users = users.filter(u => authUserFollowersMapped.includes(u.id + 'pending-for-answer'))
+      console.log('_________fffffff')
+      console.log(users)
+      totalCount = authFriendsQuery.length
     }
 
     if (users) {
