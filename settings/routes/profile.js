@@ -1,7 +1,7 @@
 'use strict'
 const express = require('express')
 const controller = require('../../controller/profile')
-const fileMiddleware = require('../../middleware/file_img')
+const fileMiddleware = require('../../middleware/file_avatarImg')
 
 const router = express.Router()
 

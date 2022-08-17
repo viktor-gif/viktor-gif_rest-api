@@ -55,5 +55,6 @@ app.use('/posts', require('./settings/routes/posts'))
 let userAvatarDirectory = require('./controller/profile').userAvatarDirectory
 console.log(userAvatarDirectory);
 app.use(`/files/images/avatar/${userAvatarDirectory || ''}`, express.static(path.join(__dirname, 'files', 'images', 'avatar', userAvatarDirectory || '')))
+app.use(`/files/images/posts || ''}`, express.static(path.join(__dirname, 'files', 'images', 'posts' || '')))
 
 module.exports = app

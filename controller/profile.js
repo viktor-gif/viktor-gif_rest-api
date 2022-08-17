@@ -92,21 +92,19 @@ exports.userAvatarDirectory = userAvatarDirectory
 
 
 exports.updatePhoto = (req, res) => {
-    console.log('9999999999999999999999999')
     const pathAvatar = path.join(__dirname.slice(0, -10), 'files/images/avatar', req.session.userId)
-    console.log('fksdflsdfjskd: ' + pathAvatar)
+    
     fs.readdir(pathAvatar, (err, files) => {
         if (err) throw err;
-
         for (const file of files) {
-                if (file !== path.basename(req.file.path)) {
-                    console.log('FILE: ' + file)
-                    console.log('req.file.path____: ' + path.basename(req.file.path))
-                fs.unlink(path.join(pathAvatar, file), (err) => {
-                    if (err) throw err;
-                    console.log('Картинка видалена');
-                });
-            }
+          if (file !== path.basename(req.file.path)) {
+              console.log('FILE: ' + file)
+              console.log('req.file.path____: ' + path.basename(req.file.path))
+            fs.unlink(path.join(pathAvatar, file), (err) => {
+              if (err) throw err;
+              console.log('Картинка видалена');
+            });
+          }
         }
     })
 

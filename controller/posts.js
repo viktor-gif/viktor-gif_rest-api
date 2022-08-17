@@ -1,4 +1,5 @@
 'use strict'
+const path = require('path')
 const errorHandler = require('../utils/errorHandler')
 const successHandler = require('../utils/successHandler')
 const userErrorHandler = require('../utils/userErrorHandler')
@@ -42,6 +43,51 @@ exports.addPost = async (req, res, next) => {
     }
   }
   
+}
+exports.addImages = (req, res) => {
+    // const pathAvatar = path.join(__dirname.slice(0, -10), 'files/images/posts')
+
+        const photoUrl = req.protocol + '://' + req.get('host') + '/' + req.file.path
+        console.log('photourl: ' + photoUrl);
+        try {
+            if (req.file) {
+            
+              res.json(req.file)
+              
+            }
+        } catch (err) {
+            console.log(err);
+        }
+}
+exports.addVideo = (req, res) => {
+    // const pathAvatar = path.join(__dirname.slice(0, -10), 'files/images/posts')
+
+        const photoUrl = req.protocol + '://' + req.get('host') + '/' + req.file.path
+        console.log('photourl: ' + photoUrl);
+        try {
+            if (req.file) {
+            
+              res.json(req.file)
+              
+            }
+        } catch (err) {
+            console.log(err);
+        }
+}
+exports.addAudio = (req, res) => {
+    // const pathAvatar = path.join(__dirname.slice(0, -10), 'files/images/posts')
+
+        const photoUrl = req.protocol + '://' + req.get('host') + '/' + req.file.path
+        console.log('photourl: ' + photoUrl);
+        try {
+            if (req.file) {
+            
+              res.json(req.file)
+              
+            }
+        } catch (err) {
+            console.log(err);
+        }
 }
 exports.deletePost = async (req, res, next) => {
   if (!req.session.userId) {
