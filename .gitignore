@@ -22,3 +22,9 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+#ignore images
+/files/audio/posts/
+/files/dideo/posts/
+/files/images/posts/
+/files/images/avatar/

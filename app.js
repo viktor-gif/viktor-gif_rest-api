@@ -52,9 +52,12 @@ app.use('/dialogs', require('./settings/routes/dialogs'))
 app.use('/posts', require('./settings/routes/posts'))
 // Routes
 
+// Statics
 let userAvatarDirectory = require('./controller/profile').userAvatarDirectory
 console.log(userAvatarDirectory);
 app.use(`/files/images/avatar/${userAvatarDirectory || ''}`, express.static(path.join(__dirname, 'files', 'images', 'avatar', userAvatarDirectory || '')))
-app.use(`/files/images/posts || ''}`, express.static(path.join(__dirname, 'files', 'images', 'posts' || '')))
+app.use(`/files/images/posts`, express.static(path.join(__dirname, 'files', 'images', 'posts')))
+app.use(`/files/video/posts`, express.static(path.join(__dirname, 'files', 'video', 'posts')))
+app.use(`/files/audio/posts`, express.static(path.join(__dirname, 'files', 'audio', 'posts')))
 
 module.exports = app

@@ -30,11 +30,36 @@ exports.addPost = async (req, res, next) => {
       message: "Ви не зареєстровані. Ввійдіть, будь ласка, в аккаунт."
     })
   } else {
+    const postText = req.query.postText
     try {
+      console.log('req.file_________FFFFFFFFFF')
+      console.log(req.file)
+      const fileUrl = req.file ? req.protocol + '://' + req.get('host') + '/' + req.file.path : null
+      const extname = req.file ? path.extname(req.file.path) : null
+
+      let imgUrl = null
+      let videoUrl = null
+      let audioUrl = null
+
+      if (extname === '.png' || extname === '.jpeg' || extname === '.jpg' || extname === '.webp') {
+        imgUrl = fileUrl
+      } else if (extname === '.mp4' || extname === '.mov' || extname === '.mpeg4' || extname === '.flv' || extname === '.webm' || extname === '.asf' || extname === '.avi') {
+        videoUrl = fileUrl
+      } else if (extname === '.mpeg' || extname === '.ogg' || extname === '.mp3' || extname === '.aac') {
+        audioUrl = fileUrl
+      }
+
+      console.log(imgUrl)
+      console.log(videoUrl)
+      console.log(audioUrl)
+
       const newPost = new Post({
         authorId: req.session.userId,
         profileId: req.query.userId,
-        postText: req.body.postText
+        postText: postText || null,
+        postImg: imgUrl,
+        postVideo: videoUrl,
+        postAudio: audioUrl
       })
       await newPost.save()
       successHandler(res, 201, "Ви створили новий пост")
@@ -47,7 +72,10 @@ exports.addPost = async (req, res, next) => {
 exports.addImages = (req, res) => {
     // const pathAvatar = path.join(__dirname.slice(0, -10), 'files/images/posts')
 
-        const photoUrl = req.protocol + '://' + req.get('host') + '/' + req.file.path
+  const photoUrl = req.protocol + '://' + req.get('host') + '/' + req.file.path
+  const extname = path.extname(req.file.path)
+  console.log(`REQ_FILE_PATH: ${path.extname(req.file.path)}`)
+  //console.log(req.file)
         console.log('photourl: ' + photoUrl);
         try {
             if (req.file) {

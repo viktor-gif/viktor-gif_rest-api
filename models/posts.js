@@ -37,7 +37,19 @@ const postsSchema = new Schema({
     },
     postText: {
         type: String,
-        required: true
+        default: null
+    },
+    postImg: {
+        type: String,
+        default: null
+    },
+    postVideo: {
+        type: String,
+        default: null
+    },
+    postAudio: {
+        type: String,
+        default: null
     },
     likedUsers: [String],
     likesCount: {
