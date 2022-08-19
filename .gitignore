@@ -25,6 +25,6 @@ yarn-error.log*
 
 #ignore images
 /files/audio/posts/
-/files/dideo/posts/
+/files/video/posts/
 /files/images/posts/
 /files/images/avatar/
