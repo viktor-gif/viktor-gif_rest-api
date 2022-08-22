@@ -4,9 +4,8 @@ const multer = require('multer')
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // '/files' это директория в которую будут сохранятся файлы 
+    // '/files' это директория в которую будут сохранятся файлы
     const mimetype = file.mimetype
-
     let path = 'images'
     if (mimetype === 'image/png' || mimetype === 'image/jpeg' || mimetype === 'image/jpg' || mimetype === 'image/webp') {
       path = 'images'
@@ -15,8 +14,7 @@ const storage = multer.diskStorage({
     } else if (mimetype === 'audio/mpeg' || mimetype === 'audio/ogg' || mimetype === 'audio/mp3' || mimetype === 'audio/aac') {
       path = 'audio'
     }
-
-    cb(null,`files/${path}/posts`)
+    cb(null,`files/${path}/${req.query.whereIsFile}`)
   },
   filename: (req, file, cb) => {
 // Возьмем оригинальное название файла, и под этим же названием сохраним его на сервере

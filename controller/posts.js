@@ -32,8 +32,6 @@ exports.addPost = async (req, res, next) => {
   } else {
     const postText = req.query.postText
     try {
-      console.log('req.file_________FFFFFFFFFF')
-      console.log(req.file)
       const fileUrl = req.file ? req.protocol + '://' + req.get('host') + '/' + req.file.path : null
       const extname = req.file ? path.extname(req.file.path) : null
 
@@ -48,10 +46,6 @@ exports.addPost = async (req, res, next) => {
       } else if (extname === '.mpeg' || extname === '.ogg' || extname === '.mp3' || extname === '.aac') {
         audioUrl = fileUrl
       }
-
-      console.log(imgUrl)
-      console.log(videoUrl)
-      console.log(audioUrl)
 
       const newPost = new Post({
         authorId: req.session.userId,
@@ -68,54 +62,6 @@ exports.addPost = async (req, res, next) => {
     }
   }
   
-}
-exports.addImages = (req, res) => {
-    // const pathAvatar = path.join(__dirname.slice(0, -10), 'files/images/posts')
-
-  const photoUrl = req.protocol + '://' + req.get('host') + '/' + req.file.path
-  const extname = path.extname(req.file.path)
-  console.log(`REQ_FILE_PATH: ${path.extname(req.file.path)}`)
-  //console.log(req.file)
-        console.log('photourl: ' + photoUrl);
-        try {
-            if (req.file) {
-            
-              res.json(req.file)
-              
-            }
-        } catch (err) {
-            console.log(err);
-        }
-}
-exports.addVideo = (req, res) => {
-    // const pathAvatar = path.join(__dirname.slice(0, -10), 'files/images/posts')
-
-        const photoUrl = req.protocol + '://' + req.get('host') + '/' + req.file.path
-        console.log('photourl: ' + photoUrl);
-        try {
-            if (req.file) {
-            
-              res.json(req.file)
-              
-            }
-        } catch (err) {
-            console.log(err);
-        }
-}
-exports.addAudio = (req, res) => {
-    // const pathAvatar = path.join(__dirname.slice(0, -10), 'files/images/posts')
-
-        const photoUrl = req.protocol + '://' + req.get('host') + '/' + req.file.path
-        console.log('photourl: ' + photoUrl);
-        try {
-            if (req.file) {
-            
-              res.json(req.file)
-              
-            }
-        } catch (err) {
-            console.log(err);
-        }
 }
 exports.deletePost = async (req, res, next) => {
   if (!req.session.userId) {
@@ -198,10 +144,30 @@ exports.addComment = async (req, res, next) => {
       message: "Ви не зареєстровані. Ввійдіть, будь ласка, в аккаунт."
     })
   } else {
+    const commentText = req.query.commentText || null
+    const linkToAnotherComment = req.query.linkToAnotherComment || null
     try {
+      const fileUrl = req.file ? req.protocol + '://' + req.get('host') + '/' + req.file.path : null
+      const extname = req.file ? path.extname(req.file.path) : null
+
+      let imgUrl = null
+      let videoUrl = null
+      let audioUrl = null
+
+      if (extname === '.png' || extname === '.jpeg' || extname === '.jpg' || extname === '.webp') {
+        imgUrl = fileUrl
+      } else if (extname === '.mp4' || extname === '.mov' || extname === '.mpeg4' || extname === '.flv' || extname === '.webm' || extname === '.asf' || extname === '.avi') {
+        videoUrl = fileUrl
+      } else if (extname === '.mpeg' || extname === '.ogg' || extname === '.mp3' || extname === '.aac') {
+        audioUrl = fileUrl
+      }
       const newComment = new Comment({
-        commentText: req.body.commentText,
         authorId: req.session.userId,
+        image: imgUrl,
+        video: videoUrl,
+        audio: audioUrl,
+        commentText,
+        linkToAnotherComment
       })
       // const newMessage = { message: 'hello world' }
       const post = await Post.findById(req.params.postId)

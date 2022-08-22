@@ -24,7 +24,12 @@ yarn-debug.log*
 yarn-error.log*
 
 #ignore images
+/files/images/avatar/
+
 /files/audio/posts/
 /files/video/posts/
 /files/images/posts/
-/files/images/avatar/
+
+/files/audio/dialogs/
+/files/video/dialogs/
+/files/images/dialogs/

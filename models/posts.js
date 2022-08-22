@@ -9,13 +9,29 @@ const commentsSchema = new Schema({
         type: Schema.Types.ObjectId,
         required: true
     },
+    linkToAnotherComment: {
+        type: String,
+        default: null
+    },
     created: {
         type: Date,
         default: Date.now
     },
     commentText: {
         type: String,
-        required: true
+        default: null
+    },
+    image: {
+        type: String,
+        default: null
+    },
+    video: {
+        type: String,
+        default: null
+    },
+    audio: {
+        type: String,
+        default: null
     },
     likedUsers: [String],
     likesCount: {

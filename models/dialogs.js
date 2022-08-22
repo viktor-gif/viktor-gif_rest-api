@@ -4,7 +4,19 @@ const mongoose = require('mongoose'),
 const dialogSchema = new Schema({
     message: {
         type: String,
-        required: true
+        default: null
+    },
+    image: {
+        type: String,
+        default: null
+    },
+    video: {
+        type: String,
+        default: null
+    },
+    audio: {
+        type: String,
+        default: null
     },
     viewed: {
         type: Boolean,

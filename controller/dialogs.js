@@ -1,4 +1,5 @@
 'use strict'
+const path = require('path')
 const Dialog = require('../models/dialogs').dialog
 const Message = require('../models/dialogs').message
 const errorHandler = require('../utils/errorHandler')
@@ -90,8 +91,27 @@ exports.sendDialogMessage = async (req, res, next) => {
     })
   } else {
     try {
+
+      const fileUrl = req.file ? req.protocol + '://' + req.get('host') + '/' + req.file.path : null
+      const extname = req.file ? path.extname(req.file.path) : null
+
+      let imgUrl = null
+      let videoUrl = null
+      let audioUrl = null
+
+      if (extname === '.png' || extname === '.jpeg' || extname === '.jpg' || extname === '.webp') {
+        imgUrl = fileUrl
+      } else if (extname === '.mp4' || extname === '.mov' || extname === '.mpeg4' || extname === '.flv' || extname === '.webm' || extname === '.asf' || extname === '.avi') {
+        videoUrl = fileUrl
+      } else if (extname === '.mpeg' || extname === '.ogg' || extname === '.mp3' || extname === '.aac') {
+        audioUrl = fileUrl
+      }
+
       const newMessage = new Message({
-        message: req.body.message,
+        message: req.query.messageText || null,
+        image: imgUrl,
+        video: videoUrl,
+        audio: audioUrl,
         sender: req.session.userId
       })
       // const newMessage = { message: 'hello world' }
