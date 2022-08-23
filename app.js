@@ -65,4 +65,8 @@ app.use(`/files/images/dialogs`, express.static(path.join(__dirname, 'files', 'i
 app.use(`/files/video/dialogs`, express.static(path.join(__dirname, 'files', 'video', 'dialogs')))
 app.use(`/files/audio/dialogs`, express.static(path.join(__dirname, 'files', 'audio', 'dialogs')))
 
+app.use(`/files/images/comments`, express.static(path.join(__dirname, 'files', 'images', 'comments')))
+app.use(`/files/video/comments`, express.static(path.join(__dirname, 'files', 'video', 'comments')))
+app.use(`/files/audio/comments`, express.static(path.join(__dirname, 'files', 'audio', 'comments')))
+
 module.exports = app

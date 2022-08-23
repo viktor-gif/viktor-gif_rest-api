@@ -5,6 +5,8 @@ const multer = require('multer')
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // '/files' это директория в которую будут сохранятся файлы
+    console.log(')))_______-------_______')
+    console.log(req.query.whereIsFile)
     const mimetype = file.mimetype
     let path = 'images'
     if (mimetype === 'image/png' || mimetype === 'image/jpeg' || mimetype === 'image/jpg' || mimetype === 'image/webp') {
