@@ -145,8 +145,10 @@ exports.addComment = async (req, res, next) => {
     })
   } else {
     const commentText = req.query.commentText || null
-    const linkToAnotherComment = req.query.linkToAnotherComment || null
+    const linkToAnotherComment = req.query.linkToAnotherComment === "null" ? null : req.query.linkToAnotherComment
     try {
+      console.log('____-----____')
+      console.log(typeof req.query.linkToAnotherComment)
       const fileUrl = req.file ? req.protocol + '://' + req.get('host') + '/' + req.file.path : null
       const extname = req.file ? path.extname(req.file.path) : null
 
