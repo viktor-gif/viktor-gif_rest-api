@@ -13,6 +13,8 @@ router.get('/:dialogId/messages', controller.getDialogMessages)
 
 router.post('/:dialogId/messages', filesMiddleware.single('dialogs'), controller.sendDialogMessage)
 
+router.put('/:dialogId/messages/:messageId/update', filesMiddleware.single('dialogs'), controller.updateMessage)
+
 router.delete('/:dialogId/messages/:messageId', controller.deleteMessage)
 router.delete('/:dialogId/messages/:messageId', controller.deleteMessage)
 router.put('/:dialogId/messages/:messageId/set_spam', controller.setSpam)

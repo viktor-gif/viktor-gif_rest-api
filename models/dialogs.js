@@ -53,22 +53,6 @@ const dialogsSchema = new Schema({
         type: Schema.Types.ObjectId,
         required: true
     },
-    ownerImgUrl: {
-        type: String,
-        default: null
-    },
-    userImgUrl: {
-        type: String,
-        default: null
-    },
-    ownerName: {
-        type: String,
-        required: true
-    },
-    userName: {
-        type: String,
-        required: true
-    },
     created: {
         type: Date,
         default: Date.now

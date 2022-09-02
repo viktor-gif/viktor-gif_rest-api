@@ -6,6 +6,7 @@ const errorHandler = require('../utils/errorHandler')
 const successHandler = require('../utils/successHandler')
 const userErrorHandler = require('../utils/userErrorHandler')
 const User = require('../models/user').user
+const fs = require('fs')
 
 /* GET users listing. */
 exports.getDialogs = async (req, res, next) => {
@@ -57,8 +58,6 @@ exports.addDialog = async (req, res, next) => {
           ownerId: req.query.userId,
           userId: req.session.userId
         })
-        const owner = await User.findById(req.session.userId)
-        const user = await User.findById(req.query.userId)
         if (ownerDialog || userDialog) {
           res.status(409).json({
             message: 'Такий діалог вже існує'
@@ -67,11 +66,7 @@ exports.addDialog = async (req, res, next) => {
           const newDialog = new Dialog({
             Dialog: [],
             ownerId: req.session.userId,
-            userId: req.query.userId,
-            ownerImgUrl: owner.photos.small,
-            userImgUrl: user.photos.small,
-            ownerName: owner.fullName,
-            userName: user.fullName
+            userId: req.query.userId
           })
           await newDialog.save()
           res.status(201).json({
@@ -133,6 +128,81 @@ exports.sendDialogMessage = async (req, res, next) => {
     }
   }
 }
+
+exports.updateMessage = async (req, res, next) => {
+  if (!req.session.userId) {
+    res.status(403).json({
+      message: "Ви не зареєстровані. Ввійдіть, будь ласка, в аккаунт."
+    })
+  } else {
+    try {
+      
+      const dialog = await Dialog.findById(req.params.dialogId)
+      const currentDialog = dialog.dialog.find(item => item._id == req.params.messageId)
+
+      const fileUrl = req.file ? req.protocol + '://' + req.get('host') + '/' + req.file.path : null
+      const extname = req.file ? path.extname(req.file.path) : null
+
+      let imgUrl = null
+      let videoUrl = null
+      let audioUrl = null
+
+      if (extname === '.png' || extname === '.jpeg' || extname === '.jpg' || extname === '.webp') {
+        imgUrl = fileUrl
+      } else if (extname === '.mp4' || extname === '.mov' || extname === '.mpeg4' || extname === '.flv' || extname === '.webm' || extname === '.asf' || extname === '.avi') {
+        videoUrl = fileUrl
+      } else if (extname === '.mpeg' || extname === '.ogg' || extname === '.mp3' || extname === '.aac') {
+        audioUrl = fileUrl
+      }
+
+      let fileType = null
+      if (currentDialog.image) {
+        fileType = 'images'
+      } else if (currentDialog.video) {
+        fileType = 'video'
+      } else if (currentDialog.audio) {
+        fileType = 'audio'
+      }
+
+      let filePath = null
+      if (currentDialog.image) {
+        filePath = currentDialog.image
+      } else if (currentDialog.video) {
+        filePath = currentDialog.video
+      } else if (currentDialog.audio) {
+        filePath = currentDialog.audio
+      }
+      const pathDialogsFile = path.join(__dirname.slice(0, -10), `files/${fileType}/dialogs`)
+
+      if (req.file) {
+        fs.unlink(path.join(pathDialogsFile, path.basename(filePath)), (err) => {
+          if (err) throw err;
+          console.log('Картинка видалена');
+        });
+      }
+
+      const updatedDialog = await Dialog.updateOne(
+        { _id: req.params.dialogId, "dialog._id": req.params.messageId },
+        {
+          $set: {
+            "dialog.$.message": req.query.messageText || null,
+            "dialog.$.image": req.file ? imgUrl : currentDialog.image,
+            "dialog.$.video": req.file ? videoUrl : currentDialog.video,
+            "dialog.$.audio": req.file ? audioUrl : currentDialog.audio
+          }
+        })
+      if (!updatedDialog) {
+        userErrorHandler(res, 404, "Такого повідомлення не знайдено")
+      } else {
+        successHandler(res, 200, "Повідомлення було виправлено")
+      }
+      
+    } catch (err) {
+      errorHandler(res, err)
+    }
+  }
+} 
+
 exports.getDialogMessages = async (req, res, next) => {
   if (!req.session.userId) {
     res.status(403).json({
