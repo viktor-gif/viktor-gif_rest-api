@@ -70,6 +70,64 @@ exports.deletePost = async (req, res, next) => {
     })
   } else {
     try {
+      const post = await Post.findById(req.params.postId)
+      const comments = post.comments
+
+      comments.forEach(c => {
+
+        let fileType = null
+        if (c.image) {
+          fileType = 'images'
+        } else if (c.video) {
+          fileType = 'video'
+        } else if (c.audio) {
+          fileType = 'audio'
+        }
+
+        let filePath = null
+        if (c.image) {
+          filePath = c.image
+        } else if (c.video) {
+          filePath = c.video
+        } else if (c.audio) {
+          filePath = c.audio
+        }
+        const pathCommentsFile = path.join(__dirname.slice(0, -10), `files/${fileType}/comments`)
+
+        if (filePath) {
+          fs.unlink(path.join(pathCommentsFile, path.basename(filePath)), (err) => {
+            if (err) throw err;
+            console.log('Картинка видалена');
+          });
+        }
+      })
+
+      let fileType = null
+      if (post.postImg) {
+        fileType = 'images'
+      } else if (post.postVideo) {
+        fileType = 'video'
+      } else if (post.postAudio) {
+        fileType = 'audio'
+      }
+
+      let filePath = null
+      if (post.postImg) {
+        filePath = post.postImg
+      } else if (post.postVideo) {
+        filePath = post.postVideo
+      } else if (post.postAudio) {
+        filePath = post.postAudio
+      }
+      const pathPostsFile = path.join(__dirname.slice(0, -10), `files/${fileType}/posts`)
+
+      if (filePath) {
+        fs.unlink(path.join(pathPostsFile, path.basename(filePath)), (err) => {
+          if (err) throw err;
+          console.log('Картинка видалена');
+        });
+      }
+
       Post.findByIdAndDelete(req.params.postId, (err, result) => {
         if (err) {
           console.log(err)
@@ -86,80 +144,6 @@ exports.deletePost = async (req, res, next) => {
     }
   }
 }
-
-exports.updateMessage = async (req, res, next) => {
-  if (!req.session.userId) {
-    res.status(403).json({
-      message: "Ви не зареєстровані. Ввійдіть, будь ласка, в аккаунт."
-    })
-  } else {
-    try {
-      
-      const dialog = await Dialog.findById(req.params.dialogId)
-      const currentDialog = dialog.dialog.find(item => item._id == req.params.messageId)
-
-      let imgUrl = null
-      let videoUrl = null
-      let audioUrl = null
-
-      const fileUrl = req.file ? req.protocol + '://' + req.get('host') + '/' + req.file.path : null
-      const extname = req.file ? path.extname(req.file.path) : null
-
-      if (extname === '.png' || extname === '.jpeg' || extname === '.jpg' || extname === '.webp') {
-        imgUrl = fileUrl
-      } else if (extname === '.mp4' || extname === '.mov' || extname === '.mpeg4' || extname === '.flv' || extname === '.webm' || extname === '.asf' || extname === '.avi') {
-        videoUrl = fileUrl
-      } else if (extname === '.mpeg' || extname === '.ogg' || extname === '.mp3' || extname === '.aac') {
-        audioUrl = fileUrl
-      }
-
-      let fileType = null
-      if (currentDialog.image) {
-        fileType = 'images'
-      } else if (currentDialog.video) {
-        fileType = 'video'
-      } else if (currentDialog.audio) {
-        fileType = 'audio'
-      }
-
-      let filePath = null
-      if (currentDialog.image) {
-        filePath = currentDialog.image
-      } else if (currentDialog.video) {
-        filePath = currentDialog.video
-      } else if (currentDialog.audio) {
-        filePath = currentDialog.audio
-      }
-      const pathDialogsFile = path.join(__dirname.slice(0, -10), `files/${fileType}/dialogs`)
-
-      if (req.file) {
-        fs.unlink(path.join(pathDialogsFile, path.basename(filePath)), (err) => {
-          if (err) throw err;
-          console.log('Картинка видалена');
-        });
-      }
-
-      const updatedDialog = await Dialog.updateOne(
-        { _id: req.params.dialogId, "dialog._id": req.params.messageId },
-        {
-          $set: {
-            "dialog.$.message": req.query.messageText || null,
-            "dialog.$.image": req.file ? imgUrl : currentDialog.image,
-            "dialog.$.video": req.file ? videoUrl : currentDialog.video,
-            "dialog.$.audio": req.file ? audioUrl : currentDialog.audio
-          }
-        })
-      if (!updatedDialog) {
-        userErrorHandler(res, 404, "Такого повідомлення не знайдено")
-      } else {
-        successHandler(res, 200, "Повідомлення було виправлено")
-      }
-      
-    } catch (err) {
-      errorHandler(res, err)
-    }
-  }
-} 
 
 exports.updatePost = async (req, res, next) => {
   if (!req.session.userId) {
