@@ -234,6 +234,34 @@ exports.deleteMessage = async (req, res, next) => {
   } else {
     try {
       const dialog = await Dialog.findById(req.params.dialogId)
+      const message = dialog.dialog.find(item => item._id == req.params.messageId)
+      
+      let fileType = null
+      if (message.image) {
+        fileType = 'images'
+      } else if (message.video) {
+        fileType = 'video'
+      } else if (message.audio) {
+        fileType = 'audio'
+      }
+
+      let filePath = null
+      if (message.image) {
+        filePath = message.image
+      } else if (message.video) {
+        filePath = message.video
+      } else if (message.audio) {
+        filePath = message.audio
+      }
+      const pathDialogsFile = path.join(__dirname.slice(0, -10), `files/${fileType}/dialogs`)
+
+      if (filePath) {
+        fs.unlink(path.join(pathDialogsFile, path.basename(filePath)), (err) => {
+          if (err) throw err;
+          console.log('Картинка видалена');
+        });
+      }
+
       dialog.dialog.pull({_id: req.params.messageId})
       await dialog.save()
       res.json('Deleted')
