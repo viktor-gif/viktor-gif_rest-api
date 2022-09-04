@@ -9,7 +9,7 @@ router.get('/', controller.getPosts)
 router.post('/', filesMiddleware.single('posts'), controller.addPost)
 
 router.delete('/:postId', controller.deletePost)
-router.put('/:postId', controller.updatePost)
+router.put('/:postId', filesMiddleware.single('posts'), controller.updatePost)
 router.put('/:postId/like', controller.toggleLike)
 router.post('/:postId/comments', filesMiddleware.single('comments'), controller.addComment)
 router.put('/:postId/comments/:commentId/update', controller.updateComment)

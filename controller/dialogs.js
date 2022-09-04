@@ -9,6 +9,8 @@ const User = require('../models/user').user
 const fs = require('fs')
 
 /* GET users listing. */
+
+
 exports.getDialogs = async (req, res, next) => {
   if (!req.session.userId) {
     res.status(403).json({
@@ -87,12 +89,12 @@ exports.sendDialogMessage = async (req, res, next) => {
   } else {
     try {
 
-      const fileUrl = req.file ? req.protocol + '://' + req.get('host') + '/' + req.file.path : null
-      const extname = req.file ? path.extname(req.file.path) : null
-
       let imgUrl = null
       let videoUrl = null
       let audioUrl = null
+
+      const fileUrl = req.file ? req.protocol + '://' + req.get('host') + '/' + req.file.path : null
+      const extname = req.file ? path.extname(req.file.path) : null
 
       if (extname === '.png' || extname === '.jpeg' || extname === '.jpg' || extname === '.webp') {
         imgUrl = fileUrl
@@ -140,12 +142,12 @@ exports.updateMessage = async (req, res, next) => {
       const dialog = await Dialog.findById(req.params.dialogId)
       const currentDialog = dialog.dialog.find(item => item._id == req.params.messageId)
 
-      const fileUrl = req.file ? req.protocol + '://' + req.get('host') + '/' + req.file.path : null
-      const extname = req.file ? path.extname(req.file.path) : null
-
       let imgUrl = null
       let videoUrl = null
       let audioUrl = null
+
+      const fileUrl = req.file ? req.protocol + '://' + req.get('host') + '/' + req.file.path : null
+      const extname = req.file ? path.extname(req.file.path) : null
 
       if (extname === '.png' || extname === '.jpeg' || extname === '.jpg' || extname === '.webp') {
         imgUrl = fileUrl
