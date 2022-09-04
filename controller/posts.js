@@ -6,7 +6,6 @@ const successHandler = require('../utils/successHandler')
 const userErrorHandler = require('../utils/userErrorHandler')
 const Post = require('../models/posts').post
 const Comment = require('../models/posts').comment
-const { json } = require('body-parser')
 
 /* GET users listing. */
 exports.getPosts = async (req, res, next) => {
@@ -171,9 +170,6 @@ exports.updatePost = async (req, res, next) => {
     try {
 
       const post = await Post.findById(req.params.postId)
-      console.log(post)
-      console.log('REQ.FILE')
-      console.log(req.file)
       let imgUrl = null
       let videoUrl = null
       let audioUrl = null
@@ -214,9 +210,6 @@ exports.updatePost = async (req, res, next) => {
           console.log('Картинка видалена');
         });
       }
-
-      console.log('REQ.QUERY')
-      console.log(req.query)
 
       Post.findByIdAndUpdate(req.params.postId,
         {
@@ -277,8 +270,6 @@ exports.addComment = async (req, res, next) => {
     const commentText = req.query.commentText || null
     const linkToAnotherComment = req.query.linkToAnotherComment === "null" ? null : req.query.linkToAnotherComment
     try {
-      console.log('____-----____')
-      console.log(typeof req.query.linkToAnotherComment)
       const fileUrl = req.file ? req.protocol + '://' + req.get('host') + '/' + req.file.path : null
       const extname = req.file ? path.extname(req.file.path) : null
 
@@ -325,14 +316,73 @@ exports.updateComment = async (req, res, next) => {
     })
   } else {
     try {
-      const updatedPost = await Post.updateOne(
-        { _id: req.params.postId, "comments._id": req.params.commentId },
-        { $set: { "comments.$.commentText": req.body.commentText } })
-      if (!updatedPost) {
-        userErrorHandler(res, 404, "Такий коментар не знайдено")
-      } else {
-        successHandler(res, 200, "Коментар було виправлено")
+      const post = await Post.findById(req.params.postId)
+      const currentComment = post.comments.find(item => item._id == req.params.commentId)
+
+      let imgUrl = null
+      let videoUrl = null
+      let audioUrl = null
+
+      const fileUrl = req.file ? req.protocol + '://' + req.get('host') + '/' + req.file.path : null
+      const extname = req.file ? path.extname(req.file.path) : null
+
+      if (extname === '.png' || extname === '.jpeg' || extname === '.jpg' || extname === '.webp') {
+        imgUrl = fileUrl
+      } else if (extname === '.mp4' || extname === '.mov' || extname === '.mpeg4' || extname === '.flv' || extname === '.webm' || extname === '.asf' || extname === '.avi') {
+        videoUrl = fileUrl
+      } else if (extname === '.mpeg' || extname === '.ogg' || extname === '.mp3' || extname === '.aac') {
+        audioUrl = fileUrl
       }
+
+      let fileType = null
+      if (currentComment.image) {
+        fileType = 'images'
+      } else if (currentComment.video) {
+        fileType = 'video'
+      } else if (currentComment.audio) {
+        fileType = 'audio'
+      }
+
+      let filePath = null
+      if (currentComment.image) {
+        filePath = currentComment.image
+      } else if (currentComment.video) {
+        filePath = currentComment.video
+      } else if (currentComment.audio) {
+        filePath = currentComment.audio
+      }
+
+      const pathCommentsFile = path.join(__dirname.slice(0, -10), `files/${fileType}/comments`)
+
+      Post.updateOne(
+        { _id: req.params.postId, "comments._id": req.params.commentId },
+        {
+          $set: {
+            "comments.$.commentText": req.query.commentText || null,
+            "comments.$.image": req.file ? imgUrl : currentComment.image,
+            "comments.$.video": req.file ? videoUrl : currentComment.video,
+            "comments.$.audio": req.file ? audioUrl : currentComment.audio
+          }
+        }, (err, result) => {
+          if (err) {
+          }
+          if (result) {
+            successHandler(res, 200, "Повідомлення було виправлено")
+          } else {
+            userErrorHandler(res, 404, "Такого повідомлення не знайдено")
+            
+          }
+      })
+
+      
+      
+      if (req.file) {
+        fs.unlink(path.join(pathCommentsFile, path.basename(filePath)), (err) => {
+          if (err) throw err;
+          console.log('Картинка видалена');
+        });
+      }
+      
     } catch (err) {
       errorHandler(res, err)
     }
