@@ -188,7 +188,7 @@ exports.updatePost = async (req, res, next) => {
       }
       const pathPostsFile = path.join(__dirname.slice(0, -10), `files/${fileType}/posts`)
 
-      if (req.file) {
+      if (req.file && filePath) {
         fs.unlink(path.join(pathPostsFile, path.basename(filePath)), (err) => {
           if (err) throw err;
           console.log('Картинка видалена');
@@ -360,7 +360,7 @@ exports.updateComment = async (req, res, next) => {
 
       
       
-      if (req.file) {
+      if (req.file && filePath) {
         fs.unlink(path.join(pathCommentsFile, path.basename(filePath)), (err) => {
           if (err) throw err;
           console.log('Картинка видалена');

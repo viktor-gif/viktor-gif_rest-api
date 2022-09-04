@@ -176,7 +176,7 @@ exports.updateMessage = async (req, res, next) => {
       }
       const pathDialogsFile = path.join(__dirname.slice(0, -10), `files/${fileType}/dialogs`)
 
-      if (req.file) {
+      if (req.file && filePath) {
         fs.unlink(path.join(pathDialogsFile, path.basename(filePath)), (err) => {
           if (err) throw err;
           console.log('Картинка видалена');
