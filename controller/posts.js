@@ -379,27 +379,57 @@ exports.deleteComment = async (req, res, next) => {
     })
   } else {
     try {
-      // const newMessage = { message: 'hello world' }
       const post = await Post.findById(req.params.postId)
-      const comment = post.comments.find(item => item._id == req.params.commentId)
-      console.log(comment)
+      const comments = post.comments
+      const currentComment = comments.find(item => item._id == req.params.commentId)
+      const answerComments = comments.filter(c => currentComment._id == c.linkToAnotherComment)
+
+      answerComments.forEach(ac => {
+        let fileType = null
+        if (ac.image) {
+          fileType = 'images'
+        } else if (ac.video) {
+          fileType = 'video'
+        } else if (ac.audio) {
+          fileType = 'audio'
+        }
+
+        let filePath = null
+        if (ac.image) {
+          filePath = ac.image
+        } else if (ac.video) {
+          filePath = ac.video
+        } else if (ac.audio) {
+          filePath = ac.audio
+        }
+
+        const pathCommentsFile = path.join(__dirname.slice(0, -10), `files/${fileType}/comments`)
+        if (filePath) {
+          fs.unlink(path.join(pathCommentsFile, path.basename(filePath)), (err) => {
+            if (err) throw err;
+            console.log('Картинка видалена');
+          });
+        }
+
+        post.comments.pull({_id: ac._id})
+      })
 
       let fileType = null
-      if (comment.image) {
+      if (currentComment.image) {
         fileType = 'images'
-      } else if (comment.video) {
+      } else if (currentComment.video) {
         fileType = 'video'
-      } else if (comment.audio) {
+      } else if (currentComment.audio) {
         fileType = 'audio'
       }
 
       let filePath = null
-      if (comment.image) {
-        filePath = comment.image
-      } else if (comment.video) {
-        filePath = comment.video
-      } else if (comment.audio) {
-        filePath = comment.audio
+      if (currentComment.image) {
+        filePath = currentComment.image
+      } else if (currentComment.video) {
+        filePath = currentComment.video
+      } else if (currentComment.audio) {
+        filePath = currentComment.audio
       }
 
       const pathCommentsFile = path.join(__dirname.slice(0, -10), `files/${fileType}/comments`)
