@@ -381,6 +381,35 @@ exports.deleteComment = async (req, res, next) => {
     try {
       // const newMessage = { message: 'hello world' }
       const post = await Post.findById(req.params.postId)
+      const comment = post.comments.find(item => item._id == req.params.commentId)
+      console.log(comment)
+
+      let fileType = null
+      if (comment.image) {
+        fileType = 'images'
+      } else if (comment.video) {
+        fileType = 'video'
+      } else if (comment.audio) {
+        fileType = 'audio'
+      }
+
+      let filePath = null
+      if (comment.image) {
+        filePath = comment.image
+      } else if (comment.video) {
+        filePath = comment.video
+      } else if (comment.audio) {
+        filePath = comment.audio
+      }
+
+      const pathCommentsFile = path.join(__dirname.slice(0, -10), `files/${fileType}/comments`)
+      if (filePath) {
+        fs.unlink(path.join(pathCommentsFile, path.basename(filePath)), (err) => {
+          if (err) throw err;
+          console.log('Картинка видалена');
+        });
+      }
+
       if (!post) {
         res.status(404).json({
           message: "Такого коментаря не існує"
