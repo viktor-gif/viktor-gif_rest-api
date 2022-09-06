@@ -50,6 +50,7 @@ app.use('/auth', require('./settings/routes/auth'))
 app.use('/follow', require('./settings/routes/follow'))
 app.use('/dialogs', require('./settings/routes/dialogs'))
 app.use('/posts', require('./settings/routes/posts'))
+app.use('/video', require('./settings/routes/commonVideo'))
 // Routes
 
 // Statics
@@ -68,5 +69,7 @@ app.use(`/files/audio/dialogs`, express.static(path.join(__dirname, 'files', 'au
 app.use(`/files/images/comments`, express.static(path.join(__dirname, 'files', 'images', 'comments')))
 app.use(`/files/video/comments`, express.static(path.join(__dirname, 'files', 'video', 'comments')))
 app.use(`/files/audio/comments`, express.static(path.join(__dirname, 'files', 'audio', 'comments')))
+
+app.use(`/files/video/common`, express.static(path.join(__dirname, 'files', 'video', 'common')))
 
 module.exports = app

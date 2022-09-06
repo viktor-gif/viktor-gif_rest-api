@@ -1,8 +1,7 @@
-
 const mongoose = require('mongoose'),
     Schema = mongoose.Schema
 
-const commentsSchema = new Schema({
+    const commentsSchema = new Schema({
     authorId: {
         ref: 'user',
         type: Schema.Types.ObjectId,
@@ -39,44 +38,30 @@ const commentsSchema = new Schema({
     },
 })
 
-const postsSchema = new Schema({
+const imgSchema = new Schema({
     authorId: {
-        ref: 'user',
-        type: Schema.Types.ObjectId,
+        type: String,
         required: true
     },
-    profileId: {
-        ref: 'user',
-        type: Schema.Types.ObjectId,
+    url: {
+        type: String,
         required: true
     },
-    postText: {
+    title: {
         type: String,
         default: null
     },
-    postImg: {
-        type: String,
-        default: null
-    },
-    postVideo: {
-        type: String,
-        default: null
-    },
-    postAudio: {
-        type: String,
-        default: null
-    },
-    likedUsers: [String],
-    likesCount: {
-        type: Number,
-        default: 0
+    isPrivat: {
+        type: Boolean,
+        default: false
     },
     comments: [commentsSchema],
+    likedUsers: [String],
     created: {
         type: Date,
         default: Date.now
     }
 })
 
-exports.post = mongoose.model('posts', postsSchema)
-exports.comment = mongoose.model('postComments', commentsSchema)
+exports.img = mongoose.model('img', imgSchema)
+exports.imgComments = mongoose.model('imgComments', commentsSchema)

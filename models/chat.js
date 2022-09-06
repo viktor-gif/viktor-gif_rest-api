@@ -1,5 +1,3 @@
-const { required } = require('nconf')
-
 const mongoose = require('mongoose'),
     Schema = mongoose.Schema
 

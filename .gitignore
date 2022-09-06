@@ -38,3 +38,5 @@ yarn-error.log*
 /files/video/comments/
 /files/images/comments/
 
+/files/video/common/
+
