@@ -102,7 +102,9 @@ const schema = new Schema({
         }
     },
     followers: [followersSchema],
-
+    imgIds: [{type: String}],
+    videoIds: [{type: String}],
+    audioIds: [{type: String}],
     salt: {
         type: String,
         required: true

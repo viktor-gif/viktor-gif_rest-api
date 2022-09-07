@@ -7,5 +7,6 @@ const router = express.Router()
 
 router.get('/', controller.getVideo)
 router.post('/', filesMiddleware.single('video'), controller.addVideo)
+router.put('/:videoId/add', controller.addCommonVideo)
 
 module.exports = router
