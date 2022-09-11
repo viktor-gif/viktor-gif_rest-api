@@ -15,7 +15,7 @@ app.use(expressCspHeader({
         'img-src': [SELF]
     }
 }))
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(cookieParser())
 
@@ -51,6 +51,7 @@ app.use('/follow', require('./settings/routes/follow'))
 app.use('/dialogs', require('./settings/routes/dialogs'))
 app.use('/posts', require('./settings/routes/posts'))
 app.use('/video', require('./settings/routes/commonVideo'))
+app.use('/audio', require('./settings/routes/commonAudio'))
 // Routes
 
 // Statics
@@ -71,5 +72,6 @@ app.use(`/files/video/comments`, express.static(path.join(__dirname, 'files', 'v
 app.use(`/files/audio/comments`, express.static(path.join(__dirname, 'files', 'audio', 'comments')))
 
 app.use(`/files/video/common`, express.static(path.join(__dirname, 'files', 'video', 'common')))
+app.use(`/files/audio/common`, express.static(path.join(__dirname, 'files', 'audio', 'common')))
 
 module.exports = app
