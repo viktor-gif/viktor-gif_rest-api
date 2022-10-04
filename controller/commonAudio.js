@@ -22,8 +22,8 @@ exports.getAudio = async (req, res, next) => {
 
       if (audioType && audioType === "common_audio") {
         const commonAudio = term
-          ? await Audio.find({ isPrivat: false, title: regex }).limit(5).skip(0)
-          : await Audio.find({ isPrivat: false }).limit(5).skip(0)
+          ? await Audio.find({ isPrivat: false, title: regex }).limit(20).skip(0)
+          : await Audio.find({ isPrivat: false }).limit(20).skip(0)
 
         if (commonAudio) {
           res.status(200).json(commonAudio)
@@ -32,8 +32,8 @@ exports.getAudio = async (req, res, next) => {
         }
       } else if (audioType && audioType === "all_my_audio") {
         const allMyAudio = term
-          ? await Audio.find({ authorId: req.session.userId, title: regex }).limit(5).skip(0)
-          : await Audio.find({ authorId: req.session.userId }).limit(5).skip(0)
+          ? await Audio.find({ authorId: req.session.userId, title: regex }).limit(20).skip(0)
+          : await Audio.find({ authorId: req.session.userId }).limit(20).skip(0)
 
         if (allMyAudio) {
           res.status(200).json(allMyAudio)
@@ -42,8 +42,8 @@ exports.getAudio = async (req, res, next) => {
         }
       } else if (audioType && audioType === "my_privat_audio") {
         const myPrivatAudio = term
-          ? await Audio.find({ authorId: req.session.userId, isPrivat: true, title: regex }).limit(5).skip(0)
-          : await Audio.find({ authorId: req.session.userId, isPrivat: true }).limit(5).skip(0)
+          ? await Audio.find({ authorId: req.session.userId, isPrivat: true, title: regex }).limit(20).skip(0)
+          : await Audio.find({ authorId: req.session.userId, isPrivat: true }).limit(20).skip(0)
 
         if (myPrivatAudio) {
           res.status(200).json(myPrivatAudio)
@@ -52,8 +52,8 @@ exports.getAudio = async (req, res, next) => {
         }
       } else if (audioType && audioType === "my_common_audio") {
         const myCommonAudio = term
-          ? await Audio.find({ authorId: req.session.userId, isPrivat: false, title: regex }).limit(5).skip(0)
-          : await Audio.find({ authorId: req.session.userId, isPrivat: false }).limit(5).skip(0)
+          ? await Audio.find({ authorId: req.session.userId, isPrivat: false, title: regex }).limit(20).skip(0)
+          : await Audio.find({ authorId: req.session.userId, isPrivat: false }).limit(20).skip(0)
 
         if (myCommonAudio) {
           res.status(200).json(myCommonAudio)

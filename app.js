@@ -53,6 +53,8 @@ app.use('/posts', require('./settings/routes/posts'))
 app.use('/video', require('./settings/routes/commonVideo'))
 app.use('/audio', require('./settings/routes/commonAudio'))
 app.use('/img', require('./settings/routes/commonImg'))
+
+app.use('/groops', require('./settings/routes/groops'))
 // Routes
 
 // Statics
