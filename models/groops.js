@@ -277,6 +277,18 @@ const groopsSchema = new Schema({
         type: String,
         default: 'public'
     },
+    topic: {
+        type: String,
+        default: 'no topic'
+    },
+    mainImg: {
+        type: String,
+        default: null
+    },
+    describeInfo: {
+        type: String,
+        default: null
+    },
 
     followers: [String],
     posts: [groopsPostsSchema],

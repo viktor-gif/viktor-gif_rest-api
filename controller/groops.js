@@ -19,7 +19,7 @@ exports.createGroop = async (req, res, next) => {
       type: req.query.groopType
     })
     await newGroop.save()
-    res.status(201).json('Groop created')
+    res.status(201).json('Groop created' + newGroop)
   }
 }
 exports.getGroops = async (req, res, next) => {
@@ -30,6 +30,16 @@ exports.getGroops = async (req, res, next) => {
   } else {
     const groops = await Groop.find()
     res.status(200).json(groops)
+  }
+};
+exports.getGroopInfo = async (req, res, next) => {
+  if (!req.session.userId) {
+    res.status(403).json({
+      message: "Ви не зареєстровані. Ввійдіть, будь ласка, в аккаунт."
+    })
+  } else {
+    const groop = await Groop.findById(req.params.groopId)
+    res.status(200).json(groop)
   }
 };
 exports.deleteGroop = async(req, res, next) => {
