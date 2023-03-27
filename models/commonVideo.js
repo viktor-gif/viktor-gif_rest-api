@@ -43,6 +43,10 @@ const videoSchema = new Schema({
         type: String,
         required: true
     },
+    groopId: {
+        type: String,
+        default: null
+    },
     url: {
         type: String,
         required: true

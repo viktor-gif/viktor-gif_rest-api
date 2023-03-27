@@ -6,6 +6,7 @@ const userErrorHandler = require('../utils/userErrorHandler')
 const errorHandler = require('../utils/errorHandler')
 
 const Groop = require('../models/groops').groop
+const Post = require('../models/groops').posts
 // const errorHandler = require('../utils/errorHandler')
 // const successHandler = require('../utils/successHandler')
 // const userErrorHandler = require('../utils/userErrorHandler')
@@ -89,3 +90,36 @@ exports.deleteFollower = async (req, res, next) => {
     }
   }
 };
+
+exports.addPost = async (req, res, next) => {
+  if (!req.session.userId) {
+    res.status(403).json({
+      message: "Ви не зареєстровані. Ввійдіть, будь ласка, в аккаунт."
+    })
+  } else {
+    const groop = await Groop.findById(req.params.groopId)
+    const postText = req.query.postText
+    
+    groop.posts.push({
+      authorId: req.session.userId,
+      postText
+    })
+
+      await groop.save()
+  };
+}
+exports.deletePost = async (req, res, next) => {
+  if (!req.session.userId) {
+    res.status(403).json({
+      message: "Ви не зареєстровані. Ввійдіть, будь ласка, в аккаунт."
+    })
+  } else {
+    const groop = await Groop.findById(req.params.groopId)
+    
+    groop.posts.pull({
+      _id: req.params.postId
+    })
+
+      await groop.save()
+  };
+}

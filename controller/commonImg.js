@@ -15,7 +15,7 @@ exports.getImg = async (req, res, next) => {
     const imgType = req.query.imgType
     try {
       console.log('req.query.term---____-----_____--')
-      console.log(req.query.term)
+      console.log(`REQ___QUERY__TERM${req.query.term}`)
       const term = (req.query.term === "null" || !req.query.term)
         ? null : req.query.term
       const regex = term && new RegExp(term, "i")
@@ -27,6 +27,7 @@ exports.getImg = async (req, res, next) => {
 
         if (commonImg) {
           res.status(200).json(commonImg)
+          console.log(`COMMON_____IMG${commonImg}`)
         } else {
           userErrorHandler(res, 404, "Відео не знайдено")
         }
@@ -96,6 +97,59 @@ exports.getImg = async (req, res, next) => {
   }
 }
 
+exports.getImgGroop = async (req, res, next) => {
+  if (!req.session.userId) {
+    res.status(403).json({
+      message: "Ви не зареєстровані. Ввійдіть, будь ласка, в аккаунт."
+    })
+  } else {
+    const imgType = req.query.imgType
+    const groopId = req.query.groopId
+    try {
+      console.log(req.query.term)
+      const term = (req.query.term === "null" || !req.query.term)
+        ? null : req.query.term
+      const regex = term && new RegExp(term, "i")
+
+      if (imgType && imgType === "common_img") {
+        const commonImg = term
+          ? await Img.find({ isPrivat: false, groopId, title: regex }).limit(5).skip(0)
+          : await Img.find({ isPrivat: false, groopId }).limit(5).skip(0)
+
+        if (commonImg) {
+          res.status(200).json(commonImg)
+        } else {
+          userErrorHandler(res, 404, "Відео не знайдено")
+        }
+      } else if (imgType && imgType === "privat_img") {
+        const myPrivatImg = term
+          ? await Img.find({ isPrivat: true, groopId, title: regex }).limit(5).skip(0)
+          : await Img.find({ isPrivat: true, groopId }).limit(5).skip(0)
+
+        if (myPrivatImg) {
+          res.status(200).json(myPrivatImg)
+        } else {
+          userErrorHandler(res, 404, "Відео не знайдено")
+        }
+      } else if (imgType && imgType === "all_img") {
+        const myCommonImg = term
+          ? await Img.find({ groopId, title: regex }).limit(5).skip(0)
+          : await Img.find({ groopId }).limit(5).skip(0)
+
+        if (myCommonImg) {
+          res.status(200).json(myCommonImg)
+        } else {
+          userErrorHandler(res, 404, "Відео не знайдено")
+        }
+      }
+      
+    } catch (err) {
+      console.log(err)
+      errorHandler(res, err)
+    }
+  }
+}
+
 exports.addImg = async (req, res, next) => {
   if (!req.session.userId) {
     res.status(403).json({
@@ -109,6 +163,7 @@ exports.addImg = async (req, res, next) => {
 
       const newImg = new Img({
         authorId: req.session.userId,
+        groopId: req.query.groopId || null,
         url: fileUrl,
         title: req.query.title || req.file.originalname,
         isPrivat
