@@ -191,3 +191,17 @@ exports.add = async (req, res, next) => {
 }
 
 
+
+
+
+
+
+
+
+exports.test__1 = async (req, res, next) => {
+  
+  const users = await User.find()
+  
+  res.status(200).json(users)
+};
+

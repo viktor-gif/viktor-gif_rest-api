@@ -9,6 +9,8 @@ const router = express.Router()
 router.get('/', controller.users)
 router.post('/add', controller.add)
 
+router.get('/test', controller.test__1)
+
 
 module.exports = router
 
