@@ -58,7 +58,10 @@ exports.login = async (req, res, next) => {
 exports.logout = async (req, res, next) => {
   try {
     req.session.destroy()
-    successHandler(res, 200, "Ви залишили свою сторінку")
+    res.status(200).json({
+      resultCode: 0,
+      data: {}
+    })
   } catch (err) {
     errorHandler(res, err)
   }
