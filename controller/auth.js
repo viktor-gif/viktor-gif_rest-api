@@ -37,12 +37,17 @@ exports.login = async (req, res, next) => {
         req.session.email = user.email
         req.session.login = user.login
 
-        successHandler(res, 200, "Ви залогінились")
+        res.status(200).json({
+          resultCode: 0,
+          data: {
+            userId: user._id
+          }
+        })
       } else {
-        userErrorHandler(res, 403, "Пароль не вірний")
+        userErrorHandler(res, 404, "Пароль або e-mail вказані не вірно")
       }
     } else {
-      userErrorHandler(res, 404, "Такого користувача не існує")
+      userErrorHandler(res, 404, "Пароль або e-mail вказані не вірно")
     }
     
   } catch (err) {
