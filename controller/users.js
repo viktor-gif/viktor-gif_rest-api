@@ -3,6 +3,7 @@ const User = require('../models/user').user
 const errorHandler = require('../utils/errorHandler')
 const path = require('path')
 const fs = require('fs')
+const userErrorHandler = require('../utils/userErrorHandler')
 
 /* GET users listing. */
 exports.users = async (req, res, next) => {
@@ -152,9 +153,7 @@ exports.add = async (req, res, next) => {
   const candidate = await User.findOne({ email: req.query.email })
 
   if (candidate) {
-    res.status(409).json({
-      message: 'Такий email вже зайнятий. Спробуйте другий.'
-    })
+    userErrorHandler(res, 409, 'Такий email вже зайнятий. Спробуйте другий.')
   } else {
     // const salt = bcrypt.getSaltSync(10)
     // const password = req.body.password
@@ -162,28 +161,33 @@ exports.add = async (req, res, next) => {
     // this is password with bcrypt
     // password: bcrypt.hashSync(req.query.password, salt),
 
-    const user = new User({
-      fullName: req.query.fullName,
-      password: req.query.password,
-      email: req.query.email,
-      login: req.query.login,
-      location: {
-        country: "USA",
-        city: "New-York"
-      },
-      followers: {
-        userId: '1111',
-        friendStatus: 'unfollowed'
-      }
-    })
+    
     try {
+
+      const user = new User({
+        fullName: req.query.fullName,
+        password: req.query.password,
+        email: req.query.email,
+        location: {
+          country: "USA",
+          city: "New-York"
+        },
+        followers: {
+          userId: '1111',
+          friendStatus: 'unfollowed'
+        }
+      })
+
       const pathName = path.join(__dirname.slice(0, -10), 'files', 'images', 'avatar', user._id.toString())
       console.log('PATH___________: ' + pathName);
       fs.mkdir(pathName, (err, data) => {
-        if (err) console.log(err);
+        if (err) errorHandler(res, err)
       })
       await user.save()
-      res.status(201).json(user)
+      res.status(201).json({
+        data: user,
+        resultCode: 0
+      })
     } catch (err) {
       errorHandler(res, err)
     }

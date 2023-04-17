@@ -21,11 +21,6 @@ const schema = new Schema({
         unique: true,
         required: true
     },
-    login: {
-        type: String,
-        unique: true,
-        required: true
-    },
     hashedPassword: {
         type: String,
         unique: true,
@@ -112,6 +107,10 @@ const schema = new Schema({
     created: {
         type: Date,
         default: Date.now
+    },
+    blockedAccaunt: {
+        type: Boolean,
+        default: false
     }
 })
 
