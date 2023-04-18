@@ -8,11 +8,13 @@ exports.me = async (req, res, next) => {
 
   try {
     if (req.session.userId) {
+      const user = await User.findById(req.session.userId)
       res.status(200).json({
         data: {
           id: req.session.userId,
           email: req.session.email,
           login: req.session.login,
+          isBlockedAccaunt: user.blockedAccaunt
         },
         resultCode: 0
       })
@@ -30,6 +32,7 @@ exports.login = async (req, res, next) => {
 
   try{
     const user = await User.findOne({ email })
+    const isBlockedAccaunt =  user.blockedAccaunt
 
     if (user) {
       if (user.checkPassword(password)) {
@@ -40,6 +43,7 @@ exports.login = async (req, res, next) => {
         res.status(200).json({
           resultCode: 0,
           data: {
+            isBlockedAccaunt,
             userId: user._id
           }
         })
