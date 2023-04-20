@@ -32,7 +32,7 @@ exports.login = async (req, res, next) => {
 
   try{
     const user = await User.findOne({ email })
-    const isBlockedAccaunt =  user.blockedAccaunt
+    const isBlockedAccaunt =  user?.blockedAccaunt
 
     if (user) {
       if (user.checkPassword(password)) {
