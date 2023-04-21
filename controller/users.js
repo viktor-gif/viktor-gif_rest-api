@@ -96,7 +96,8 @@ exports.users = async (req, res, next) => {
             status: u.status,
             location: u.location,
             photos: u.photos,
-            followers: u.followers
+            followers: u.followers,
+            isBlockedAccaunt: u.isBlockedAccaunt
           }
         }),
         totalCount,

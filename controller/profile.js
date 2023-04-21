@@ -13,7 +13,7 @@ exports.userProfile = async (req, res, next) => {
       userErrorHandler(res, 401, "Вибачте, ви не авторизовані")
     } else {
       const userProfile = await User.findById(userId,
-        'fullName lookingForAJobDescription aboutMe lookingForAJob photos location contacts created')
+        'fullName lookingForAJobDescription aboutMe lookingForAJob photos location contacts created isBlockedAccaunt')
 
       if (!userProfile) {
         res.status(404), json("Такого користувача не існує")
