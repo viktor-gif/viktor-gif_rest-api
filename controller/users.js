@@ -111,44 +111,52 @@ exports.users = async (req, res, next) => {
     errorHandler(res, err)
   }
 };
-// exports.add = (req, res, next) => {
-//   let statusCode = 200
-//   const user = new User({
-//     fullName: req.query.fullName,
-//     password: req.query.password,
-//     email: req.query.email,
-//     login: req.query.login,
-//     location: {
-//       country: "USA",
-//       city: "New-York"
-//     },
-//     followers: {
-//       userId: '1111',
-//       friendStatus: 'unfollowed'
-//     }
-//   })
-//   user.save((err, user) => {
-//     if (err) {
-//       if (err.message.includes('email')) {
-//         response.status('Вибачте, такий email уже існує', res, 403)
-//       } else if (err.message.includes('login')) {
-//         response.status('Вибачте, такий login уже існує', res, 403)
-//       } else {
-//         next(err)
-//       }
 
-//     } else {
-//       const pathName = path.join(__dirname.slice(0, -10), 'files', 'images', 'avatar', user._id.toString())
-//       console.log('PATH___________: ' + pathName);
-//       fs.mkdir(pathName, (err, data) => {
-//         if (err) console.log(err);
-//       })
-//       response.status(null, res, 200)
-//     }
+exports.deleteUser = async (req, res, next) => {
+  if (!req.session.userId) {
+    res.status(403).json({
+      message: "Ви не зареєстровані. Ввійдіть, будь ласка, в аккаунт."
+    })
+  } else {
+    try{
+      User.findOneAndUpdate({_id: req.session.userId}, {blockedAccaunt: true}, (err, user) => {
+    
+        if (err) errorHandler(res, err)
 
-//   })
+        res.status(204).json({
+          resultCode: 0,
+          data: req.session.userId
+        })
+    
+      })
+    } catch (err) {
+      errorHandler(res, err)
+    }
+  }
+};
+exports.restoreUser = async (req, res, next) => {
+  if (!req.session.userId) {
+    res.status(403).json({
+      message: "Ви не зареєстровані. Ввійдіть, будь ласка, в аккаунт."
+    })
+  } else {
+    try{
+      User.findOneAndUpdate({_id: req.session.userId}, {blockedAccaunt: false}, (err, user) => {
+    
+        if (err) errorHandler(res, err)
 
-// }
+        res.status(201).json({
+          resultCode: 0,
+          data: req.session.userId
+        })
+    
+      })
+    } catch (err) {
+      errorHandler(res, err)
+    }
+  }
+};
+
 exports.add = async (req, res, next) => {
   const candidate = await User.findOne({ email: req.query.email })
 
