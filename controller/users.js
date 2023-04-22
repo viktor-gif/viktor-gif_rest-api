@@ -97,7 +97,7 @@ exports.users = async (req, res, next) => {
             location: u.location,
             photos: u.photos,
             followers: u.followers,
-            isBlockedAccaunt: u.isBlockedAccaunt
+            blockedAccaunt: u.blockedAccaunt
           }
         }),
         totalCount,
@@ -124,9 +124,11 @@ exports.deleteUser = async (req, res, next) => {
     
         if (err) errorHandler(res, err)
 
-        res.status(204).json({
+        res.status(200).json({
           resultCode: 0,
-          data: req.session.userId
+          data: {
+            userId: req.session.userId
+          }
         })
     
       })
@@ -148,7 +150,9 @@ exports.restoreUser = async (req, res, next) => {
 
         res.status(201).json({
           resultCode: 0,
-          data: req.session.userId
+          data: {
+            userId: req.session.userId
+          }
         })
     
       })

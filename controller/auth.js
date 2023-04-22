@@ -14,7 +14,7 @@ exports.me = async (req, res, next) => {
           id: req.session.userId,
           email: req.session.email,
           login: req.session.login,
-          isBlockedAccaunt: user.blockedAccaunt
+          blockedAccaunt: user.blockedAccaunt
         },
         resultCode: 0
       })
