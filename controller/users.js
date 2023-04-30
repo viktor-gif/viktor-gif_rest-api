@@ -45,11 +45,11 @@ exports.users = async (req, res, next) => {
     let users
     // let filteredUsers
     if (friendStatus === "all") {
-      users = await User.find({ fullName: regex }, 'fullName status photos location followers').limit(limit).skip(skip)
+      users = await User.find({ fullName: regex }, 'fullName status photos location followers blockedAccaunt').limit(limit).skip(skip)
 
     } else if (friendStatus === "friends") {
 
-      users = await User.find({ fullName: regex }, 'fullName status photos location followers').limit(limit).skip(skip)
+      users = await User.find({ fullName: regex }, 'fullName status photos location followers blockedAccaunt').limit(limit).skip(skip)
       users = users.filter(u => authUserFollowersMapped.includes(u.id + 'followed'))
       totalCount = authFriends.length
 
@@ -73,12 +73,12 @@ exports.users = async (req, res, next) => {
       // totalCount = authFriends.length
 
     } else if (friendStatus === "followers") {
-      users = await User.find({ fullName: regex }, 'fullName status photos location followers').limit(limit).skip(skip)
+      users = await User.find({ fullName: regex }, 'fullName status photos location followers blockedAccaunt').limit(limit).skip(skip)
       users = users.filter(u => authUserFollowersMapped.includes(u.id + 'query-for-answer'))
       totalCount = userFriendsQuery.length
 
     } else if (friendStatus === "followed") {
-      users = await User.find({ fullName: regex }, 'fullName status photos location followers').limit(limit).skip(skip)
+      users = await User.find({ fullName: regex }, 'fullName status photos location followers blockedAccaunt').limit(limit).skip(skip)
       
       users = users.filter(u => authUserFollowersMapped.includes(u.id + 'pending-for-answer'))
       console.log('_________fffffff')
